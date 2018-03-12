@@ -1,0 +1,27 @@
+初始化用户扩展表
+manage.py@dtops > makemigrations users
+"D:\软件目录\PyCharm 2017.2.3\bin\runnerw.exe" C:\Users\niejc\Envs\dtops_env\Scripts\python.exe "D:\软件目录\PyCharm 2017.2.3\helpers\pycharm\django_manage.py" makemigrations users E:/items/dtops
+No changes detected in app 'users'
+Following files were affected
+Process finished with exit code 0
+manage.py@dtops > migrate users
+"D:\软件目录\PyCharm 2017.2.3\bin\runnerw.exe" C:\Users\niejc\Envs\dtops_env\Scripts\python.exe "D:\软件目录\PyCharm 2017.2.3\helpers\pycharm\django_manage.py" migrate users E:/items/dtops
+Operations to perform:
+  Apply all migrations: users
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0001_initial... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying users.0001_initial... OK
+Following files were affected
+Process finished with exit code 0
+
+安装xadmin依赖 
+pip install future six httplib2 django-import-export django-crispy-forms django-reversion django-formtools
