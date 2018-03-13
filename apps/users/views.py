@@ -48,3 +48,8 @@ class IndexView(View):
 
     def get(self,request):
         return render(request,'index.html',{})
+
+class UserListView(ListView):
+    template_name = 'user_list.html'
+    model = UserProfile
+    context_object_name = 'user_list'

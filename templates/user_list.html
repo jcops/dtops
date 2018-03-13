@@ -1,0 +1,140 @@
+{% extends '_base.html' %}
+{% load staticfiles %}
+
+   {% block title %}DtOps | 用户列表{% endblock %}
+    {% block custom_css %}
+    <link href="{% static 'css/plugins/dataTables/datatables.min.css'  %}" rel="stylesheet">
+    {% endblock %}
+
+{% block content %}
+      <div class="row wrapper border-bottom white-bg page-heading">
+                <div class="col-lg-10">
+                    <h2>数据表格</h2>
+                    <ol class="breadcrumb">
+                        <li>
+                            <a href="index.html">主页</a>
+                        </li>
+                        <li>
+                            <a>表格</a>
+                        </li>
+                        <li class="active">
+                            <strong>数据表格</strong>
+                        </li>
+                    </ol>
+                </div>
+                <div class="col-lg-2">
+
+                </div>
+            </div>
+        <div class="wrapper wrapper-content animated fadeInRight white-bg">
+            <div class="row">
+                <div class="col-lg-12 ">
+                <div class="ibox float-e-margins">
+                        <span>用户列表</span>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                                <li><a href="#">选项 1</a>
+                                </li>
+                                <li><a href="#">选项 2</a>
+                                </li>
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+
+                    </div>
+                    <div class="ibox-content">
+
+                     <a class="btn btn-sm btn-primary" href="">添加用户</a>
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered table-hover dataTables-example" >
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>昵称</th>
+                        <th>账号</th>
+                        <th>邮箱</th>
+                        <th>是否激活</th>
+                        <th>动作</th>
+
+                    </tr>
+                    </thead>
+                    <tbody>
+                     {% for user_list in user_list %}
+                    <tr class="gradeX">
+
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ user_list.nick_name }}</td>
+                        <td>{{ user_list.username }}</td>
+                     <td>{{ user_list.email }}</td>
+                            <td>{%  if user_list.is_active %}是{% else %}否{% endif %} </td>
+{#                        <td></td>#}
+{#                        <td class="center">4</td>#}
+{#                        <td class="center">X</td>#}
+                                                                <td><a class="btn btn-primary  btn-xs"
+                                               href="">编辑</a>
+                                            <button class="btn btn-danger  btn-xs  system_user_del"
+
+                                                 >删除
+                                            </button>
+                                        </td>
+
+                    </tr>
+  {% endfor %}
+                    </tbody>
+                    </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+
+
+
+
+{% endblock %}
+
+    <!-- Mainly scripts -->
+
+{% block footer_js %}
+    <script src="{% static 'js/plugins/dataTables/datatables.min.js' %}"></script>
+
+    <!-- Page-Level Scripts -->
+    <script>
+        $(document).ready(function(){
+            $('.dataTables-example').DataTable({
+                pageLength: 25,
+                responsive: true,
+                dom: '<"html5buttons"B>lTfgitp',
+                buttons: [
+                    { extend: 'copy'},
+                    {extend: 'csv'},
+                    {extend: 'excel', title: 'ExampleFile'},
+                    {extend: 'pdf', title: 'ExampleFile'},
+
+                    {extend: 'print',
+                     customize: function (win){
+                            $(win.document.body).addClass('white-bg');
+                            $(win.document.body).css('font-size', '10px');
+
+                            $(win.document.body).find('table')
+                                    .addClass('compact')
+                                    .css('font-size', 'inherit');
+                    }
+                    }
+                ]
+
+            });
+
+        });
+
+    </script>
+{% endblock %}
