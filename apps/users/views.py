@@ -5,7 +5,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth import authenticate,login,logout
 
 from users.models import UserProfile,UserLog
-from  users.forms import LoginForm
+from  users.forms import LoginForm,UserCreateForm
 # # Create your views here.
 #
 # #
@@ -112,32 +112,90 @@ def user_login(request):
                     return HttpResponseRedirect(redirect_url)
                 # 跳转到首页 user request会被带回到首页
                 return HttpResponseRedirect(reverse("index"))
-            return render(request,'users/login_two_columns.html',{"msg":"用户名或密码错误! ","form_login":form_login})
+            return render(request,'users/login_two_columns.html',{"msg":"用户名不存在! ","form_login":form_login})
         else:
-            form_login = LoginForm()
+
             # 没有成功说明里面的值是None，并再次跳转回主页面
-            return render(request, 'users/login_two_columns.html',{"msg":"用户名或密码错误! ","form_login":form_login})
+            return render(request, 'users/login_two_columns.html',{"msg":"用户名或密码错误! ","form_login":form_login,'request': request,})
 
     # 获取登录页面为get
     elif request.method == "GET":
         # render就是渲染html返回用户
+        form_login = LoginForm()
         # render三变量: request 模板名称 一个字典写明传给前端的值
-        return render(request,'users/login_two_columns.html',{})
+        return render(request,'users/login_two_columns.html',{"form_login":form_login,'request': request,})
 
-# class LogOutView(View):
-#     def get(self):
-#         request.session.clear()
+class LoginView(View):
+    '''用户登录'''
+    error=""
+    def get(self, request):
+
+        form_login = LoginForm()
+        redirect_url = request.GET.get('next', '')
+        return render(request,'users/login_two_columns.html',{"form_login":form_login,"redirect_url":redirect_url})
+
+    def post(self, request):
+        form_login = LoginForm(request.POST)
+        if form_login.is_valid():
+            # username = form_login.cleaned_data['username']
+            # password = form_login.cleaned_data['password']
+            username = request.POST.get("username","")
+            password = request.POST.get("password","")
+            user = authenticate(username=username, password=password)
+            # 如果不是null说明验证成功
+            if user is not None:
+                # login_in 两参数：request, user
+                # request是要render回去的。这些信息也就随着返回浏览器。完成登录
+                login(request, user)
+                # request.session['is_login']=request.user
+                request.session["username"] = request.user.id
+                request.session.set_expiry(600)
+                # 跳转到首页 user request会被带回到首页
+                redirect_url = request.POST.get('next', '')
+                if redirect_url:
+                    return HttpResponseRedirect(redirect_url)
+                # 跳转到首页 user request会被带回到首页
+                return HttpResponseRedirect(reverse("index"))
+
+            return render(request, 'users/login_two_columns.html',
+                          {"msg": "用户名不存在!",
+                           "form_login": form_login,
+                           })
+
+
+
+
 def logoutview(request):
     request.session.clear()
     return HttpResponseRedirect(reverse('users:login'))
+
 
 class IndexView(View):
     # model = 'UserProfile'
     # template_name = 'index.html'
     def get(self,request):
+        if not request.user.is_authenticated():
+            return  HttpResponseRedirect(reverse('users:login'))
         return render(request,'index.html')
 
 class UserListView(ListView):
     template_name = 'users/user_list.html'
     model = UserProfile
     context_object_name = 'user_list'
+
+class UserCreateView(View):
+
+    def get(self,request):
+
+        form = UserCreateForm()
+        redirect_url = request.GET.get('next', '')
+        return render(request,'users/user_list.html',
+                      {"form":form,
+                       'redirect_url':redirect_url,
+                      })
+
+    def post(self,request):
+        form = UserCreateForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            print(username)

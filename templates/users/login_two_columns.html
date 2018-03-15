@@ -22,34 +22,39 @@
     <div class="loginColumns animated fadeInDown">
         <div class="row">
 
-            <div class="col-md-6">
-                <h2 class="font-bold">欢迎登录网豫游戏</h2>
+                <div class="col-md-6">
+                    <h2 class="font-bold">欢迎登录网豫游戏</h2>
 
-                <p>土地是以它的肥沃和收获而被估价的；才能也是土地，不过它生产的不是粮食，而是真理。如果只能滋生瞑想和幻想的话，即使再大的才能也只是砂地或盐池，那上面连小草也长不出来的。
-                </p>
-                <p>—— 别林斯基</p>
+                    <p>土地是以它的肥沃和收获而被估价的；才能也是土地，不过它生产的不是粮食，而是真理。如果只能滋生瞑想和幻想的话，即使再大的才能也只是砂地或盐池，那上面连小草也长不出来的。
+                    </p>
+                    <p>—— 别林斯基</p>
 
-            </div>
+                </div>
             <div class="col-md-11">
                 <div class="ibox-content">
 {#                    <form class="m-t" action="{% url 'users:login' %}" method="post" autocomplete="off">#}
-                     <form class="m-t" role="form" method="post" action={% url 'users:login' %} autocomplete="off" >
-                        <div class="form-group  ">
-                            <input type="text" class="form-control" name="username" placeholder="用户名" required="">
-                        </div>
-                        <div class="form-group">
-                            <input type="password" class="form-control" name="password" placeholder="密码" required="">
-                        </div>
-{#                               <div class="error btns login-form-tips" id="jsLoginTips">#}
-{#                        {% for key,error in login_form.errors.items %}{{ error }}{% endfor %}</div>#}
-                      {{ login_form.non_field_errors }}
-                     <div class="auto-box marb38">
-{#                        <button type="submit" class="btn btn-primary block full-width m-b">登录</button>#}
-                          <button type="submit" class="btn btn-primary block full-width m-b">Login</button>
-{#                        <input class="hidden" name="next" value="{{ redirect_url }}"/>#}
-                         <input type="hidden" name="next" value="{{ redirect_url }}" />
+{#                    {% if form_login.errors %}#}
+{#                       <p class="red-fonts">{{ form_login.non_field_errors.as_text }}</p>#}
+{#                    {% endif %}#}
+{#                        {% if form.errors %}#}
+{#        <p style="color: red;">#}
+{#           {{ form.errors|pluralize }}#}
+{#        </p>#}
+{#        {% endif %}#}
+{#                         <div class="error btns login-form-tips" id="jsLoginTips">#}
+{#                        {% for key,error in form_login.errors.items %}{{ error }}{% endfor %}</div>#}
+                     <form class="m-t" role="form" method="post" action="{% url 'users:login' %}" autocomplete="off">
+                         {% csrf_token %}
+                         {{ form_login.as_p }}
+                         {% if form_login.errors %}
+                         {{ form_login.errors }}
+                         {% endif %}
 
+                     <div class="auto-box marb38">
+                          <button type="submit" class="btn btn-primary block full-width m-b">Login</button>
+                         <input type="hidden" name="next" value="{{ redirect_url }}" />
                      </div>
+                          </form>
 {#                        <a href="#">#}
 {#                            <small>忘记密码?</small>#}
 {#                        </a>#}
@@ -58,13 +63,14 @@
 {#                            <small>还没有账号?</small>#}
 {#                        </p>#}
 {#                        <a class="btn btn-sm btn-white btn-block" href="register.html">创建一个帐户</a>#}
-                        {% csrf_token %}
-                         </form>
+
+
                     <p class="m-t">
                     </p>
                 </div>
             </div>
         </div>
+    </div>
         <hr/>
 {#        <div class="row">#}
 {#            <div class="col-md-6">#}
