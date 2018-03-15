@@ -19,30 +19,48 @@ class LoginForm(forms.Form):
 
 
 
-class UserCreateForm(forms.Form):
+class UserCreateForm(forms.ModelForm):
 
-    # username = forms.CharField(required=True, label="用户名",
-    #                            error_messages={'required': '用户名不能为空'},
-    #                            max_length=15,
-    #                            widget=forms.TextInput(attrs={'class':'form-control','placeholder': u"用户名"}))
+    username = forms.CharField(required=True, label="用户名",
+                               error_messages={'required': '用户名不能为空'},
+                               max_length=15,
+                               widget=forms.TextInput(attrs={'class':'form-control','placeholder': u"用户名"}))
+
+    nick_name = forms.CharField(label="昵称",
+                                widget=forms.TextInput(attrs={'class': 'form-control','placeholder':'昵称'}))
+
+    password = forms.CharField(required=True, label="密码",
+                               error_messages={'required': '密码不能为空',},
+                               max_length=20,
+                               widget=forms.PasswordInput(attrs={'class':'form-control','placeholder': "密码"}))
+
+    mobile = forms.CharField(required=True,label="手机号",
+                             error_messages={'required': '手机号不能为空'},
+                             max_length=11,
+                             widget=forms.TextInput(attrs={'class': 'form-control','placeholder':'手机号'}))
     #
-    # nick_name = forms.CharField(label="昵称",
-    #                             widget=forms.TextInput(attrs={'class': 'form-control','placeholder':'昵称'}))
-    #
-    # password = forms.CharField(required=True, label="密码",
-    #                            error_messages={'required': '密码不能为空',},
-    #                            max_length=20,
-    #                            widget=forms.PasswordInput(attrs={'class':'form-control','data-placeholder': "密码"}))
-    #
-    # mobile = forms.CharField(required=True,label="手机号",
-    #                          error_messages={'required': '手机号不能为空'},
-    #                          max_length=11,
-    #                          widget=forms.TextInput(attrs={'class': 'form-control','placeholder':'手机号'}))
-    #
-    # email = forms.EmailField(required=True,label='邮箱',
-    #                          error_messages={'required': '邮箱不能为空'},
-    #                          widget=forms.EmailInput(attrs={'class':'form-control','placeholder': u"邮箱"}))
-    username = forms.CharField()
+    email = forms.EmailField(required=True,label='邮箱',
+                             error_messages={'required': '邮箱不能为空'},
+                             widget=forms.EmailInput(attrs={'class':'form-control','placeholder': u"邮箱"}))
+    # username = forms.CharField()
+    class Meta:
+        model = UserProfile
+        fields = ['username','nick_name','password','email','mobile']
+        # error_messages ={
+        #     'username':'用户名不能为空',
+        #     'password':'密码不能为空',
+        #     'email':'邮箱不能为空',
+        #     'mobile':'手机号不能为空',
+        # }
+        # help_texts = {
+        #     'username':'*必填',
+        #     'password':'*必填',
+        #     'email':'*必填',
+        #     'mobile':'*必填',
+        # }
+        # widgets ={
+        #     'password':forms.PasswordInput(attrs={'class': 'form-control','placeholder':'密码'})
+        # }
 
     def clean_mobile(self):
         mobile = self.cleaned_data['mobile']

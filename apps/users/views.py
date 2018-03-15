@@ -178,24 +178,43 @@ class IndexView(View):
             return  HttpResponseRedirect(reverse('users:login'))
         return render(request,'index.html')
 
-class UserListView(ListView):
-    template_name = 'users/user_list.html'
+class UserListView(View):
+    # template_name = 'users/user_list.html'
+    # model = UserProfile
+    # context_object_name = 'user_list'
     model = UserProfile
     context_object_name = 'user_list'
+    def get(self,request):
+        user_list = UserProfile.objects.all()
+        form = UserCreateForm()
+        redirect_url = request.GET.get('next', '')
+        return render(request,'users/user_list.html',
+                      {"form":form,
+                        "user_list":user_list,
+                      })
 
 class UserCreateView(View):
-
+    model = UserProfile
+    context_object_name = 'user_list'
     def get(self,request):
+        user_list = UserProfile.objects.all()
 
         form = UserCreateForm()
         redirect_url = request.GET.get('next', '')
         return render(request,'users/user_list.html',
                       {"form":form,
-                       'redirect_url':redirect_url,
+                        "user_list":user_list,
                       })
 
     def post(self,request):
         form = UserCreateForm(request.POST)
         if form.is_valid():
             username = form.cleaned_data['username']
+            comment = form.save(commit=False)
+            comment.save()
             print(username)
+            return HttpResponse('{"status":"success"}', content_type='application/json')
+
+        else:
+            form =UserCreateForm()
+        return render(request,'users/user_list.html', {'form': form})
