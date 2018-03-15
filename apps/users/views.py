@@ -1,55 +1,143 @@
-from django.shortcuts import render,HttpResponse,HttpResponseRedirect,redirect
+from django.shortcuts import render,HttpResponse,HttpResponseRedirect,redirect,reverse,render_to_response
 from django.views.generic import View,TemplateView,DetailView,CreateView,UpdateView,FormView,ListView,DeleteView
 from django.views.generic.base import View
-from django.shortcuts import reverse
 from django.urls import reverse_lazy
-from django.contrib.auth import logout,login,authenticate
+from django.contrib.auth import authenticate,login,logout
 
 from users.models import UserProfile,UserLog
-from  users.forms import UserLoginForm
-# Create your views here.
-
+from  users.forms import LoginForm
+# # Create your views here.
 #
-# class LoginView(FormView):
-#     template_name = 'login_two_columns.html'
-#     form_class = UserLoginForm
-#     # success_url = ''
+# #
+# # class LoginView(FormView):
+# #     template_name = 'login_two_columns.html'
+# #     form_class = UserLoginForm
+# #     # success_url = ''
+# #
+# #     def form_valid(self, form):
+# #         login(self.request, form.get_user())
+# #         return  redirect(self.get_success_url())
 #
-#     def form_valid(self, form):
-#         login(self.request, form.get_user())
-#         return  redirect(self.get_success_url())
+#
+#
+# class LoginView(View):
+#
+#     def get(self,request):
+#         redirect_url = request.GET.get('next','')
+#         return render(request,'login_two_columns.html',{"redirect_url":redirect_url})
+#
+#     def post(self,request):
+#         login_form = UserLoginForm(request.POST)
+#         if login_form.is_valid():
+#             # 取不到时为空，username，password为前端页面name值
+#             username = request.POST.get("username", "")
+#             password = request.POST.get("password", "")
+#             # 成功返回user对象,失败返回null
+#             user = authenticate(username=username, password=password)
+#             # 如果不是null说明验证成功
+#             print(user)
+#             if user is not None:
+#                 # login_in 两参数：request, user
+#                 # 实际是对request写了一部分东西进去，然后在render的时候：
+#                 # request是要render回去的。这些信息也就随着返回浏览器。完成登录
+#                 login(request, user)
+#                 # 跳转到首页 user request会被带回到首页
+#                 redirect_url = request.POST.get('next', '')
+#                 if redirect_url:
+#                     return HttpResponseRedirect(redirect_url)
+#                 # 跳转到首页 user request会被带回到首页
+#                 return HttpResponseRedirect(reverse("index"))
+#         else:
+#             return render(request,'login_two_columns.html',{'msg':'用户名或密码错误','login_form':login_form})
 
+# class LoginView(View):
+#     '''基于类实现用户登录'''
+#     #直接调用get方法免去判断
+#     def get(self,request):
+#         # render就是渲染html返回用户
+#         # render三变量: request 模板名称 一个字典写明传给前端的值
+#         redirect_url = request.GET.get('next', '')
+#         return render(request,'users/login_two_columns.html',{'redirect_url': redirect_url,})
+#     def post(self,request):
+#         # 类实例化需要一个字典参数dict:request.POST就是一个QueryDict所以直接传入
+#         # POST中的username,password，会对应到form中
+#         login_form = LoginForm(request.POST)
+#         # is_valid判断我们字段是否有错执行我们原有逻辑，验证失败跳回login页面
+#         if login_form.is_valid():
+#             # 取不到时为空，username，password为前端页面name值
+#             user_name = login_form.cleaned_data['username']
+#             pass_word = login_form.cleaned_data['password']
+#             # 成功返回user对象,失败返回null
+#             user = authenticate(username=user_name,password=pass_word)
+#             # 如果不是null说明验证成功
+#             if user is not None:
+#                 # login_in 两参数：request, user
+#                 # 实际是对request写了一部分东西进去，然后在render的时候：
+#                 # request是要render回去的。这些信息也就随着返回浏览器。完成登录
+#                 login(request,user)
+#                 # 跳转到首页 user request会被带回到首页
+#                 redirect_url = request.POST.get('next', '')
+#                 if redirect_url:
+#                     return HttpResponseRedirect(redirect_url)
+#                 # 跳转到首页 user request会被带回到首页
+#                 return HttpResponseRedirect(reverse("index"))
+#         else:
+#             login_form = LoginForm(self.request)
+#             # 没有成功说明里面的值是None，并再次跳转回主页面
+#             return render(request, 'users/login_two_columns.html', {"msg": "用户名或密码错误", "login_form":login_form})
+#             #return HttpResponse("Please Check Your Registration Form")
 
+def user_login(request):
+    '''用戶登錄'''
 
-class LoginView(View):
-
-    def get(self,request):
-        redirect_url = request.POST.get('next','')
-        return  render(request,'login_two_columns.html',{"redirect_url":redirect_url})
-
-    def post(self,request):
-        form_class = UserLoginForm(request.POST)
-        if form_class.is_valid():
-            username = request.POST.get('username','')
-            password = request.POST.get('password','')
+    if request.method == "POST":
+        form_login = LoginForm(request.POST)
+        if form_login.is_valid():
+            username = form_login.cleaned_data['username']
+            password = form_login.cleaned_data['password']
             user = authenticate(username=username,password=password)
+            # 如果不是null说明验证成功
             if user is not None:
+                # login_in 两参数：request, user
+                # 实际是对request写了一部分东西进去，然后在render的时候：
+                # request是要render回去的。这些信息也就随着返回浏览器。完成登录
                 login(request,user)
-                request.session['is_login'] = True
+                # request.session['is_login']=request.user
+                request.session["username"] = request.user.id
+                request.session.set_expiry(600)
+                # return HttpResponseRedirect(reverse('index'))
+                # 跳转到首页 user request会被带回到首页
                 redirect_url = request.POST.get('next', '')
                 if redirect_url:
                     return HttpResponseRedirect(redirect_url)
-
-                return HttpResponseRedirect(reverse('index'))
+                # 跳转到首页 user request会被带回到首页
+                return HttpResponseRedirect(reverse("index"))
+            return render(request,'users/login_two_columns.html',{"msg":"用户名或密码错误! ","form_login":form_login})
         else:
-            return  render(request,'login_two_columns.html',{'msg':'用户名或密码错误',})
+            form_login = LoginForm()
+            # 没有成功说明里面的值是None，并再次跳转回主页面
+            return render(request, 'users/login_two_columns.html',{"msg":"用户名或密码错误! ","form_login":form_login})
+
+    # 获取登录页面为get
+    elif request.method == "GET":
+        # render就是渲染html返回用户
+        # render三变量: request 模板名称 一个字典写明传给前端的值
+        return render(request,'users/login_two_columns.html',{})
+
+# class LogOutView(View):
+#     def get(self):
+#         request.session.clear()
+def logoutview(request):
+    request.session.clear()
+    return HttpResponseRedirect(reverse('users:login'))
 
 class IndexView(View):
-
+    # model = 'UserProfile'
+    # template_name = 'index.html'
     def get(self,request):
-        return render(request,'index.html',{})
+        return render(request,'index.html')
 
 class UserListView(ListView):
-    template_name = 'user_list.html'
+    template_name = 'users/user_list.html'
     model = UserProfile
     context_object_name = 'user_list'
