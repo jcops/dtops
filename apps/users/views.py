@@ -3,7 +3,8 @@ from django.views.generic import View,TemplateView,DetailView,CreateView,UpdateV
 from django.views.generic.base import View
 from django.urls import reverse_lazy
 from django.contrib.auth import authenticate,login,logout
-
+from  django.contrib.auth.hashers import make_password
+import json
 from users.models import UserProfile,UserLog
 from  users.forms import LoginForm,UserCreateForm
 # # Create your views here.
@@ -151,6 +152,9 @@ class LoginView(View):
                 request.session["username"] = request.user.id
                 request.session.set_expiry(600)
                 # 跳转到首页 user request会被带回到首页
+                login_ip = request.META.get("REMOTE_ADDR","unknown")
+                login_agent = request.META.get("HTTP_USER_AGENT","unknown")
+                UserLog.objects.create(username=request.user,ip=login_ip,user_agent=login_agent)
                 redirect_url = request.POST.get('next', '')
                 if redirect_url:
                     return HttpResponseRedirect(redirect_url)
@@ -182,8 +186,8 @@ class UserListView(View):
     # template_name = 'users/user_list.html'
     # model = UserProfile
     # context_object_name = 'user_list'
-    model = UserProfile
-    context_object_name = 'user_list'
+    # model = UserProfile
+    # context_object_name = 'user_list'
     def get(self,request):
         user_list = UserProfile.objects.all()
         form = UserCreateForm()
@@ -194,27 +198,41 @@ class UserListView(View):
                       })
 
 class UserCreateView(View):
-    model = UserProfile
-    context_object_name = 'user_list'
     def get(self,request):
-        user_list = UserProfile.objects.all()
 
         form = UserCreateForm()
-        redirect_url = request.GET.get('next', '')
-        return render(request,'users/user_list.html',
+        return render(request,'users/create_user.html',
                       {"form":form,
-                        "user_list":user_list,
                       })
 
     def post(self,request):
         form = UserCreateForm(request.POST)
         if form.is_valid():
-            username = form.cleaned_data['username']
-            comment = form.save(commit=False)
-            comment.save()
-            print(username)
-            return HttpResponse('{"status":"success"}', content_type='application/json')
+            user = UserProfile.objects.filter(username=form.cleaned_data['username'])
+            if user:
+                return render(request,'users/create_user.html', {'msg': '用户已存在'})
+            else:
+                comment = UserProfile()
+                comment.username = form.cleaned_data['username']
+                comment.password = make_password(form.cleaned_data['password'])
+                comment.nick_name = form.cleaned_data['nick_name']
+                comment.email = form.cleaned_data['email']
+                comment.mobile = form.cleaned_data['mobile']
+                comment.save()
+                return HttpResponseRedirect(reverse('users:user_list'))
 
         else:
             form =UserCreateForm()
-        return render(request,'users/user_list.html', {'form': form})
+
+        return render(request,'users/create_user.html', {'form': form})
+
+
+class UserDeleteView(View):
+
+    def get(self,request,nid_pk):
+        ret = {'status': True, 'error': None}
+        # user_id = request.POST.get('nid',None)
+        UserProfile.objects.get(id=int(nid_pk)).delete()
+
+        # return HttpResponse(json.dumps(ret))
+        return HttpResponseRedirect(reverse('users:user_list'))

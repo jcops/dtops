@@ -1,0 +1,63 @@
+{% extends '_base.html' %}
+{% load staticfiles %}
+
+   {% block title %}DtOps | 用户列表{% endblock %}
+    {% block custom_css %}
+        <link href="{% static 'css/plugins/dataTables/datatables.min.css' %}" rel="stylesheet"
+              xmlns="http://www.w3.org/1999/html">
+    {% endblock %}
+
+{% block content %}
+      <div class="row wrapper border-bottom white-bg page-heading">
+                <div class="col-lg-10">
+                    <h2>新建用户</h2>
+                    <ol class="breadcrumb">
+                        <li>
+                            <a href="../index.html">总览</a>
+                        </li>
+                        <li>
+                            <a>用户管理</a>
+                        </li>
+                        <li class="active">
+                            <strong>新建用户</strong>
+                        </li>
+                    </ol>
+                </div>
+                <div class="col-lg-2">
+
+                </div>
+            </div>
+
+{#       <div id="modal-form" class="modal fade" aria-hidden="true">#}
+{#                                <div class="modal-dialog">#}
+{#                                    <div class="modal-content">#}
+{#                                        <div class="modal-body">#}
+                                            <div class="row">
+                                                <div class="col-sm-12 b-r"><h3 class="m-t-none m-b">用户创建</h3>
+                                                    <form id="jsResetPwdForm" role="form" method="post" action="{% url 'users:create_user' %}" autocomplete="off">
+                                                           {% csrf_token %}
+                                                        {{ form.as_p }}
+                                                        {{ form.non_field_errors }}
+                                                        {{ form.errors }}
+                                                        <div class=" modal-footer ">
+                                                            <button type="reset" class="btn btn-sm btn-primary btn-minor  " data-dismiss="modal"><strong>重置</strong></button>
+                                                            <button class="btn btn-sm btn-primary pull-right " type="submit" id="jsResetPwdBtn"><strong>提交</strong></button>
+                                                             <input type="hidden" name="next" value="{{ redirect_url }}" />
+{#                                                            <button type="button" class="btn btn-sm btn-primary m-t-n-xs btn-sm demo1" data-dismiss="modal"><strong>取消</strong></button>#}
+{#                                                            <button type="submit" class="btn btn-sm btn-primary pull-right m-t-n-xs"><strong>提交</strong></button>#}
+                                                        </div>
+
+                                                    </form>
+                                                </div>
+                                        </div>
+{#                                    </div>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+
+
+{% endblock %}
