@@ -1,7 +1,132 @@
 {% extends '_base.html' %}
 {% load staticfiles %}
    {% block title %}DtOps | 总览{% endblock %}
+{% block custom_css %}
+    <link href=" {% static 'css/plugins/c3/c3.min.css' %}" rel="stylesheet">
+    <link href=" {% static 'css/_all-skins.min.css' %}" rel="stylesheet">
+     <link href=" {% static 'css/AdminLTE.min.css' %}" rel="stylesheet">
+{% endblock %}
 {% block content %}
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        仪表盘
+        <small>dashboard</small>
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> 主页</a></li>
+        <li class="active">仪表盘</li>
+      </ol>
+    </section>
+    <section class="content">
+    <div class="row">
+        <!-- row -->
+        <div class="col-md-12">
+          <!-- jQuery Knob -->
+          <div class="box box-solid">
+            <div class="box-header">
+              <i class="fa fa-bar-chart-o"></i>
+
+              <h3 class="box-title">设备状态<small>(%)</small></h3>
+
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-default btn-sm" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-default btn-sm" data-widget="remove"><i class="fa fa-times"></i>
+                </button>
+              </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              <div class="row">
+                <div class="col-xs-6 col-md-2 col-md-offset-1 text-center">
+                  <input type="text" class="knob" value="{{ user_total }}" data-width="90" data-height="90" data-fgColor="#00a65a" data-readonly="true">
+
+                  <div class="knob-label">在线</div>
+                </div>
+                <!-- ./col -->
+                <div class="col-xs-6 col-md-2 text-center">
+                  <input type="text" class="knob" value="{{ user_total }}" data-width="90" data-height="90" data-fgColor="#f56954" data-readonly="true">
+
+                  <div class="knob-label">下线</div>
+                </div>
+                <!-- ./col -->
+
+
+                <div class="col-xs-6 col-md-2 text-center">
+                  <input type="text" class="knob" value="{{ user_total }}" data-width="90" data-height="90" data-fgColor="#932ab6" data-readonly="true">
+
+                  <div class="knob-label">故障</div>
+                </div>
+                <!-- ./col -->
+                <div class="col-xs-6 col-md-2 text-center">
+                  <input type="text" class="knob" value="{{ user_total }}" data-width="90" data-height="90" data-fgColor="#3c8dbc" data-readonly="true">
+
+                  <div class="knob-label">备用</div>
+                </div>
+                  <!-- ./col -->
+                <div class="col-xs-6 col-md-2 text-center">
+                  <input type="text" class="knob" value="{{ user_total }}" data-width="90" data-height="90" data-fgColor="#cccccc" data-readonly="true">
+
+                  <div class="knob-label">未知</div>
+                </div>
+                <!-- ./col -->
+              </div>
+              <!-- /.row -->
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+        </div>
+        <!-- /.col -->
+
+{##}
+{#        <div class="col-md-6">#}
+{#            <!-- BAR CHART -->#}
+{#          <div class="box box-success">#}
+{##}
+{#            <div class="box-header with-border">#}
+{#              <h3 class="box-title">各状态资产数量统计：</h3>#}
+{##}
+{#              <div class="box-tools pull-right">#}
+{#                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>#}
+{#                </button>#}
+{#                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>#}
+{#              </div>#}
+{#            </div>#}
+{#            <div class="box-body">#}
+{#                <div id="barChart" style="width: 600px;height:400px;"></div>#}
+{#            </div>#}
+{#            <!-- /.box-body -->#}
+{#          </div>#}
+{#        </div>#}
+{#        <!-- /.col (LEFT) -->#}
+{#        <div class="col-md-6">#}
+{#          <!-- DONUT CHART -->#}
+{#          <div class="box box-danger">#}
+{#            <div class="box-header with-border">#}
+{#              <h3 class="box-title">各类型资产数量统计：</h3>#}
+{##}
+{#              <div class="box-tools pull-right">#}
+{#                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>#}
+{#                </button>#}
+{#                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>#}
+{#              </div>#}
+{#            </div>#}
+{#            <div class="box-body">#}
+{#              <div id="donutChart" style="width: 600px;height:400px;"></div>#}
+{#            </div>#}
+{#            <!-- /.box-body -->#}
+{#          </div>#}
+{#          <!-- /.box -->#}
+{#        </div>#}
+        <!-- /.col (RIGHT) -->
+      </div>
+      <!-- /.row -->
+
+    </section>
+    <!-- /.content -->
+
 
 {#        <div id="page-wrapper" class="gray-bg dashbard-1">#}
 {#                {% include '_header_top.html' %}#}
@@ -899,4 +1024,124 @@
 {##}
 {#                </div>#}
 {#            </div>#}
+     <div class="wrapper wrapper-content animated fadeInRight">
+
+                <div class="col-lg-6">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <h5>雷达图</h5>
+                        </div>
+                        <div class="ibox-content">
+                            <div>
+                                <div id="gauge">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </div>
+
+{% endblock %}
+{% block footer_js %}
+
+
+     <script src="{% static 'js/plugins/d3/d3.min.js' %}"></script>
+    <script src="{% static 'js/plugins/c3/c3.min.js' %}"></script>
+ <script src="{% static 'js/echarts.min.js' %}"></script>
+
+
+    <script src="{% static 'js/jquery.knob.js' %}"></script>
+        <script src="{% static 'js/demo.js' %}"></script>
+            <script src="{% static 'js/app.min.js' %}"></script>
+
+            <script src="{% static 'js/fastclick.min.js' %}"></script>
+        <script src="{% static 'js/jquery.slimscroll.min.js' %}"></script>
+       <script type="text/javascript">
+
+    // 顶部服务器状态百分率圆图
+    $(function () {
+        /* jQueryKnob */
+
+        $(".knob").knob({
+             /*change : function (value) {
+       //console.log("change : " + value);
+       },
+       release : function (value) {
+       console.log("release : " + value);
+       },
+       cancel : function () {
+       console.log("cancel : " + this.value);
+       },*/
+      draw: function () {
+             // "tron" case
+        if (this.$.data(
+
+                'skin') == 'tron'
+                ) {
+
+          var a = this.angle(this.
+
+                    cv)  // Angle
+              , sa = this.
+                            startAngle          // Previous start angle
+              , sat = this.startAngle         // Start angle
+              , ea                            // Previous end angle
+              , eat = sat + a                 // End angle
+              , r = true;
+
+          this.g.lineWidth = this.lineWidth;
+
+          this.o.cursor
+          && (sat = eat - 0.3)
+          && (eat = eat + 0.3);
+
+          if (this.o.displayPrevious) {
+            ea = this.startAngle + this.angle(this.value);
+            this.o.cursor
+            && (sa = ea - 0.3)
+            && (ea = ea + 0.3);
+            this.g.beginPath();
+            this.g.strokeStyle = this.previousColor;
+            this.g.arc(this.xy, this.xy, this.radius - this.lineWidth, sa, ea, false);
+            this.g.stroke();
+          }
+
+          this.g.beginPath();
+          this.g.strokeStyle = r ? this.o.fgColor : this.fgColor;
+          this.g.arc(this.xy, this.xy, this.radius - this.lineWidth, sat, eat, false);
+          this.g.stroke();
+
+          this.g.lineWidth = 2;
+          this.g.beginPath();
+          this.g.strokeStyle = this.o.fgColor;
+          this.g.arc(this.xy, this.xy, this.radius - this.lineWidth + 1 + this.lineWidth * 2 / 3, 0, 2 * Math.PI, false);
+          this.g.stroke();
+
+          return false;
+        }
+      }
+    });
+    /* END JQUERY KNOB */
+    });
+    </script>
+
+    <script>
+            $(document).ready(function () {
+                c3.generate({
+                    bindto: '#gauge',
+                    data: {
+                        columns: [
+                            ['数据', {{ user_total }}]
+                        ],
+
+                        type: 'gauge'
+                    },
+                    color: {
+                        pattern: ['#1ab394', '#BABABA']
+
+                    }
+                });
+            });
+    </script>
 {% endblock %}

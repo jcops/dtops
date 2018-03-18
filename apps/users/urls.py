@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
 
-from  users.views import UserListView,user_login,logoutview,LoginView,UserCreateView,UserDeleteView
+from  users.views import UserListView,user_login,logoutview,LoginView,UserCreateView,UserDeleteView,UserHistoryView
 
 app_name = 'users'
 urlpatterns = [
@@ -10,4 +10,5 @@ urlpatterns = [
     url(r'user_delete/(?P<nid_pk>\d+)/$', UserDeleteView.as_view(), name='user_delete'),
     url(r'logout/$', logoutview, name='logout'),
     url(r'user_list/$', UserListView.as_view(), name='user_list'),
+    url(r'user_history/$', UserHistoryView.as_view(), name='user_history'),
 ]

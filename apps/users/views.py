@@ -5,6 +5,8 @@ from django.urls import reverse_lazy
 from django.contrib.auth import authenticate,login,logout
 from  django.contrib.auth.hashers import make_password
 import json
+from django.contrib.auth.mixins import LoginRequiredMixin,PermissionRequiredMixin
+from django.utils.decorators import method_decorator
 from users.models import UserProfile,UserLog
 from  users.forms import LoginForm,UserCreateForm
 # # Create your views here.
@@ -180,22 +182,32 @@ class IndexView(View):
     def get(self,request):
         if not request.user.is_authenticated():
             return  HttpResponseRedirect(reverse('users:login'))
-        return render(request,'index.html')
+        user_total = UserProfile.objects.all().count()
+        return render(request,'index.html',{"user_total":user_total})
 
-class UserListView(View):
-    # template_name = 'users/user_list.html'
+class UserListView(ListView):
+
+    template_name = 'users/user_list.html'
+    model = UserProfile
+    context_object_name = 'user_list'
     # model = UserProfile
     # context_object_name = 'user_list'
-    # model = UserProfile
-    # context_object_name = 'user_list'
-    def get(self,request):
-        user_list = UserProfile.objects.all()
-        form = UserCreateForm()
-        redirect_url = request.GET.get('next', '')
-        return render(request,'users/user_list.html',
-                      {"form":form,
-                        "user_list":user_list,
-                      })
+    # def get(self,request):
+    #     user_list = UserProfile.objects.all()
+    #     form = UserCreateForm()
+    #     redirect_url = request.GET.get('next', '')
+    #     return render(request,'users/user_list.html',
+    #                   {"form":form,
+    #                     "user_list":user_list,
+    #                   })
+
+    def get_context_data(self, **kwargs):
+        context = {
+            "user_active": "active",
+            "user_list_active": "active",
+        }
+        kwargs.update(context)
+        return super(UserListView, self).get_context_data(**kwargs)
 
 class UserCreateView(View):
     def get(self,request):
@@ -232,7 +244,26 @@ class UserDeleteView(View):
     def get(self,request,nid_pk):
         ret = {'status': True, 'error': None}
         # user_id = request.POST.get('nid',None)
+
         UserProfile.objects.get(id=int(nid_pk)).delete()
 
         # return HttpResponse(json.dumps(ret))
         return HttpResponseRedirect(reverse('users:user_list'))
+
+class UserHistoryView(ListView):
+    '''
+    平台登录日志
+    '''
+
+    queryset = UserLog.objects.all().order_by('-login_time')
+    template_name = 'users/user_history.html'
+    context_object_name = 'user_history'
+
+
+    def get_context_data(self, **kwargs):
+        context = {
+            "platform_active": "active",
+            "user_log_active": "active",
+        }
+        kwargs.update(context)
+        return super(UserHistoryView, self).get_context_data(**kwargs)
