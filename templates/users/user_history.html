@@ -73,21 +73,21 @@
                                             <th>用户</th>
                                             <th>客户端</th>
                                             <th>来源IP</th>
-                                               <th>城市</th>
+                                            <th>城市</th>
                                             <th>登录时间</th>
 
                                         </tr>
                                         </thead>
                                         <tbody>
 
-                                        {% for user_history in  user_history %}
+                                        {% for user_history in  page_list.object_list %}
 
                                             <tr class="gradeA">
                                                 <td>{{ user_history.id }}</td>
                                                 <td>{{ user_history.username }}</td>
                                                 <td>{{ user_history.user_agent }}</td>
                                                 <td>{{ user_history.ip }}</td>
-                                                   <td>{{ user_history.city }}</td>
+                                                <td>{{ user_history.city }}</td>
                                                 <td>{{ user_history.login_time }}</td>
 
 
@@ -99,9 +99,35 @@
                                     </table>
                                 </form>
 
+                                <div>
+                                    <ul class="pagination pull-right">
+                                        {% if page_list.has_previous %}
+                                            <li class="long"><a
+                                                    href="?{{ page_list.previous_page_number.querystring }}">上一页</a>
+                                            </li>
+                                        {% endif %}
+                                        {% for page in page_list.pages %}
+                                            {% if page %}
+                                                {% ifequal page page_list.number %}
+                                                    <li class="active"><a href="?{{ page.querystring }}">{{ page }}</a>
+                                                    </li>
+                                                {% else %}
+                                                    <li><a href="?{{ page.querystring }}">{{ page }}</a>
+                                                {% endifequal %}
+                                            {% else %}
+                                                <li class="none"><a href="">...</a></li>
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if page_list.has_next %}
+                                            <li class="long"><a
+                                                    href="?{{ page_list.next_page_number.querystring }}">下一页</a></li>
+                                        {% endif %}
+                                    </ul>
+
+                                </div>
+
 
                             </div>
-
                         </div>
                     </div>
                 </div>

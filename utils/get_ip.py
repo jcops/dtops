@@ -18,5 +18,5 @@ class Get_Ip(object):
         return content['data']
 if __name__ == '__main__':
     get_ip = Get_Ip("183.131.17.228",)
-    a= "".join(get_ip.getip())
+    a= "".join(get_ip.getip()).strip()
     print(a)

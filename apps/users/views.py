@@ -4,14 +4,21 @@ from django.views.generic.base import View
 from django.urls import reverse_lazy
 from django.contrib.auth import authenticate,login,logout
 from  django.contrib.auth.hashers import make_password
+from  django.contrib.auth.decorators import login_required
 import json
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin,PermissionRequiredMixin
 from django.utils.decorators import method_decorator
+
+from pure_pagination import Paginator, EmptyPage, PageNotAnInteger
+
+
 from users.models import UserProfile,UserLog
 from  users.forms import LoginForm,UserCreateForm,UserUpdateModelForm
 from utils.get_ip import Get_Ip
 # # Create your views here.
+
+
 
 class LoginView(View):
     '''用户登录'''
@@ -64,26 +71,28 @@ def logoutview(request):
     return HttpResponseRedirect(reverse('users:login'))
 
 
-class IndexView(View):
+class IndexView(LoginRequiredMixin,View):
     '''首页仪表盘'''
     # model = 'UserProfile'
     # template_name = 'index.html'
+    # @method_decorator(login_required)
     def get(self,request):
         if not request.user.is_authenticated():
             return  HttpResponseRedirect(reverse('users:login'))
         user_total = UserProfile.objects.all().count()
         return render(request,'index.html',{"user_total":user_total})
 
-class UserListView(ListView):
+
+class UserListView(LoginRequiredMixin,ListView):
     '''用户列表'''
+
     template_name = 'users/user_list.html'
     model = UserProfile
     context_object_name = 'user_list'
     queryset = UserProfile.objects.all()
 
+
     def get_context_data(self, **kwargs):
-
-
         context = {
             "user_active": "active",
             "user_list_active": "active",
@@ -101,7 +110,7 @@ class UserListView(ListView):
             queryset = super().get_queryset()
         return queryset
 
-class UserCreateView(View):
+class UserCreateView(LoginRequiredMixin,View):
     '''创建用户'''
     def get(self,request):
 
@@ -132,7 +141,7 @@ class UserCreateView(View):
         return render(request,'users/create_user.html', {'form': form})
 
 
-class UserDeleteView(View):
+class UserDeleteView(LoginRequiredMixin,View):
     '''删除用户'''
     def get(self,request,nid_pk):
         ret = {'status': True, 'error': None}
@@ -145,7 +154,7 @@ class UserDeleteView(View):
 
 
 
-class UserDelView(View):
+class UserDelView(LoginRequiredMixin,View):
     '''删除用户(ajax)'''
     model = UserProfile
 
@@ -158,21 +167,30 @@ class UserDelView(View):
         return HttpResponse(json.dumps(ret))
 
 
-class UserHistoryView(ListView):
+class UserHistoryView(LoginRequiredMixin,ListView):
     '''平台登录日志'''
     queryset = UserLog.objects.all().order_by('-login_time')
     template_name = 'users/user_history.html'
-    context_object_name = 'user_history'
+    # context_object_name = 'user_history'
 
     def get_context_data(self, **kwargs):
+        try:
+            page = self.request.GET.get('page', 1)
+        except PageNotAnInteger:
+            page = 1
+            # 这里指从allorg中取五个出来，每页显示3个
+        p = Paginator(self.queryset, 10, request=self.request)
+        page_list = p.page(page)
+        print(page_list)
         context = {
             "platform_active": "active",
             "user_log_active": "active",
+            "page_list":page_list,
         }
         kwargs.update(context)
         return super(UserHistoryView, self).get_context_data(**kwargs)
 
-class UserDeatilView(DetailView):
+class UserDeatilView(LoginRequiredMixin,DetailView):
     '''用户详情页'''
     model = UserProfile
     template_name = 'users/user_detail.html'
@@ -187,7 +205,7 @@ class UserDeatilView(DetailView):
         kwargs.update(context)
         return  super(UserDeatilView,self).get_context_data(**kwargs)
 
-class UserUpdateView(UpdateView):
+class UserUpdateView(LoginRequiredMixin,UpdateView):
     '''用户信息更新'''
     model = UserProfile
     form_class = UserUpdateModelForm
