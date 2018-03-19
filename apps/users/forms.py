@@ -70,3 +70,25 @@ class UserCreateForm(forms.ModelForm):
             return mobile
         else:
             raise forms.ValidationError("手机号码非法", code="mobile_invalid")
+
+
+class UserUpdateModelForm(forms.ModelForm):
+
+    class Meta:
+        model = UserProfile
+        fields = ['nick_name','username','email','mobile','is_superuser','is_active','is_staff',]
+        # exclude = ['password','user_permissions']
+        labels = {
+            'username':'用户名',
+            'nick_name':'昵称'
+        }
+        widgets={
+            'username':forms.TextInput(attrs={'class':'form-control'}),
+            'nick_name':forms.TextInput(attrs={'class':'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'mobile': forms.TextInput(attrs={'class': 'form-control'}),
+            'is_superuser': forms.CheckboxInput(),
+            # 'is_active': forms.ChoiceField(attrs={'class': 'form-control'}),
+            # 'is_staff': forms.ChoiceField(attrs={'class': 'form-control'}),
+
+        }

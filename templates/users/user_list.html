@@ -26,74 +26,6 @@
 
         </div>
     </div>
-    {#        <div class="wrapper wrapper-content animated fadeInRight white-bg">#}
-    {#            <div class="row">#}
-    {#                <div class="col-lg-12 ">#}
-    {#                <div class="ibox float-e-margins">#}
-    {#                        <span>用户列表</span>#}
-    {#                        <div class="ibox-tools">#}
-    {#                            <a class="collapse-link">#}
-    {#                                <i class="fa fa-chevron-up"></i>#}
-    {#                            </a>#}
-    {#                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">#}
-    {#                                <i class="fa fa-wrench"></i>#}
-    {#                            </a>#}
-    {#                            <ul class="dropdown-menu dropdown-user">#}
-    {#                                <li><a href="#">选项 1</a>#}
-    {#                                </li>#}
-    {#                                <li><a href="#">选项 2</a>#}
-    {#                                </li>#}
-    {#                            </ul>#}
-    {#                            <a class="close-link">#}
-    {#                                <i class="fa fa-times"></i>#}
-    {#                            </a>#}
-    {##}
-    {#                    </div>#}
-    {##}
-    {#                        <div class="ibox-content">#}
-    {#                            <div class="text-left">#}
-    {#                            <a data-toggle="modal" class="btn btn-sm btn-primary" href="#modal-form">添加用户</a>#}
-    {#                            </div>#}
-    {#                            <div id="modal-form" class="modal fade" aria-hidden="true">#}
-    {#                                <div class="modal-dialog">#}
-    {#                                    <div class="modal-content">#}
-    {#                                        <div class="modal-body">#}
-    {#                                            <div class="row">#}
-    {#                                                <div class="col-sm-12 b-r"><h3 class="m-t-none m-b">用户创建</h3>#}
-    {#                                                    <form id="jsResetPwdForm" role="form" autocomplete="off">#}
-    {#                                                           {% csrf_token %}#}
-    {#                                                        <div class="form-group"><label>电子邮件</label> <input type="email" placeholder="请输入电子邮件" class="form-control"></div>#}
-    {#                                                        <div class="form-group"><label>密码</label> <input type="password" placeholder="请输入密码" class="form-control"></div>#}
-    {#                                                        <div class="form-group"><label>密码</label> <input type="username" placeholder="请输入密码" class="form-control"></div>#}
-    {#                                                        <div class="form-group"></div>#}
-    {#                                                        {{ form.as_p }}#}
-    {#                                                        {{ form.non_field_errors }}#}
-    {#                                                        {{ form.errors }}#}
-    {#                                                        <div class=" modal-footer ">#}
-    {#                                                            <button type="button" class="btn btn-sm btn-primary btn-minor  m-t-n-xs " data-dismiss="modal"><strong>取消</strong></button>#}
-    {#                                                            <button class="btn btn-sm btn-primary pull-right m-t-n-xs" type="submit" id="jsResetPwdBtn"><strong>提交</strong></button>#}
-    {#                                                             <input type="hidden" name="next" value="{{ redirect_url }}" />#}
-    {#                                                            <button type="button" class="btn btn-sm btn-primary m-t-n-xs btn-sm demo1" data-dismiss="modal"><strong>取消</strong></button>#}
-    {#                                                            <button type="submit" class="btn btn-sm btn-primary pull-right m-t-n-xs"><strong>提交</strong></button>#}
-    {#                                                        </div>#}
-    {##}
-    {#                                                    </form>#}
-    {#                                                </div>#}
-    {#                                                <div class="col-sm-6"><h4>非平台会员?</h4>#}
-    {#                                                    <p>您可以创建一个帐户:</p>#}
-    {#                                                    <p class="text-center">#}
-    {#                                                        <a href=""><i class="fa fa-sign-in big-icon"></i></a>#}
-    {#                                                    </p>#}
-    {#                                            </div>#}
-    {#                                        </div>#}
-    {#                                    </div>#}
-    {#                                    </div>#}
-    {#                                </div>#}
-    {#                        </div>#}
-    {#                    </div>#}
-    {#                </div>#}
-    {#            </div>#}
-    {#        </div>#}
 
     <div class="ibox-content">
         <div class="" id="content_start">
@@ -117,12 +49,13 @@
             创建用户 </a></div>
         <div id="user_list_table_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
             <div id="uc" class="pull-left"></div>
+            <form method="get" action="{% url 'users:user_list' %}" class="form-horizontal">
+            <div id="user_list_table_filter" class="dataTables_filter">
+                <label>搜索</label>
+                    <input type="search" class="form-control input-sm" name="search" placeholder="请输入..." aria-controls="user_list_table">
 
-            <div id="user_list_table_filter" class="dataTables_filter"><label>搜索<input type="search"
-                                                                                       class="form-control input-sm"
-                                                                                       placeholder=""
-                                                                                       aria-controls="user_list_table"></label>
             </div>
+            </form>
             <div class="dataTables_length" id="user_list_table_length">
                 <label>每页 <select name="user_list_table_length" aria-controls="user_list_table"
                                   class="form-control input-sm">
@@ -156,7 +89,7 @@
                         {#         <input type="checkbox" class="text-center ipt_check" id="{{ user_list.id }}">#}
                         {#        </td>#}
                         <td class=" text-center"><input type="checkbox" value="{{ user_list.id }}" name="id"></td>
-                        <td class=" text-center"><a href="">{{ user_list.nick_name }}</a></td>
+                        <td class=" text-center"><a href="{% url 'users:user_detail' user_list.id %}">{{ user_list.nick_name }}</a></td>
                         <td class=" text-center">{{ user_list.username }}</td>
                         <td class=" text-center">{{ user_list.email }}</td>
 
@@ -166,8 +99,8 @@
                         </td>
 
                         <td class=" text-center">
-                            <a href="" class="btn btn-xs btn-info">更新</a>
-                            <a href="{% url 'users:user_delete' user_list.id %}" class="btn btn-xs btn-danger m-l-xs ">删除</a>
+                            <a href="{% url 'users:user_detail' user_list.id %}" class="btn btn-xs btn-info">详情</a>
+                            <button class="btn btn-xs btn-danger m-l-xs user_del1 del2" id="{{ user_list.id }}">删除</button>
 
                             {#              <button class="btn btn-xs btn-danger m-l-xs system_user_del" id="{{ user_list.id }}">删除</button>#}
                         </td>
@@ -318,38 +251,6 @@
         });
 
 
-        {#    $(document).on('click', '.asset_del', function () {#}
-        {#                    var id = $(this).parent().parent().parent().attr('id');#}
-        {#                    swal({#}
-        {#                        title: "你确定删除",#}
-        {#                        text: "你将无法恢复",#}
-        {#                        type: "warning",#}
-        {#                        showCancelButton: true,#}
-        {#                        confirmButtonColor: "#DD6B55",#}
-        {#                        confirmButtonText: "确定",#}
-        {#                        closeOnConfirm: false#}
-        {#                    }, function () {#}
-        {#                        $.ajax({#}
-        {#                            url: "{% url 'users:user_delete'  %}",#}
-        {#                            type: 'POST',#}
-        {#                            data: {'nid': id},#}
-        {#                            success: function (data) {#}
-        {#                                var obj = JSON.parse(data);#}
-        {#                                if (obj.status) {#}
-        {#                                    swal({title: "删除", text: "已成功删除", type: "success"}, function () {#}
-        {#                                        window.location.reload();#}
-        {#                                    })#}
-        {#                                } else {#}
-        {#                                    swal("错误", "删除" + "[ " + obj.error + " ]" + "遇到错误", "error");#}
-        {#                                }#}
-        {#                            }#}
-        {#                        });#}
-        {##}
-        {##}
-        {#                    });#}
-        {##}
-        {#                });#}
-
         $(document).ready(function () {
             $('.dataTables-asset').DataTable({
 
@@ -380,5 +281,42 @@
 
 
     </script>
+   <script>
+            $(function () {
+                $('.user_del1').click(function () {
+                    var nid = $(this).attr('id');
+{#                        console.log(nid);#}
+                    swal({
+                        title: "你确定删除",
+                        text: "你将无法恢复",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "确定",
+                        closeOnConfirm: false
+                    }, function () {
 
+                        $.ajax({
+                            url: "{% url 'users:user_del'  %}",
+                            type: 'POST',
+                            data: {'nid': nid },
+                            success: function (data) {
+
+                                var obj = JSON.parse(data);
+                                if (obj.status) {
+                                    swal({title: "删除", text: "已成功删除", type: "success"}, function () {
+                                        location.href = "{% url "users:user_list" %}"
+                                    })
+                                } else {
+                                    swal("错误", "删除" + "[ " + obj.error + " ]" + "遇到错误", "error");
+                                }
+                            }
+                        });
+
+
+                    });
+                });
+
+            });
+        </script>
 {% endblock %}

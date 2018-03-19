@@ -1,6 +1,9 @@
+{% load static %}
 {% load staticfiles %}
+
 <!-- Mainly scripts -->
-<script src="{% static 'js/jquery-3.1.1.min.js' %}"></script>
+
+<script src="{% static "js/jquery-3.1.1.min.js"%}"></script>
 <script src="{% static 'js/bootstrap.min.js' %}"></script>
 <script src="{% static 'js/plugins/metisMenu/jquery.metisMenu.js' %}"></script>
 <script src="{% static 'js/plugins/slimscroll/jquery.slimscroll.min.js' %}"></script>
@@ -34,12 +37,16 @@
 
 <!-- ChartJS-->
 <script src="{% static 'js/plugins/chartJs/Chart.min.js' %}"></script>
-
 <!-- Toastr -->
 <script src="{% static 'js/plugins/toastr/toastr.min.js' %}"></script>
+<!-- Sweet alert -->
+<script src="{% static 'js/plugins/sweetalert/sweetalert.min.js' %}"></script>
+
 <script type="text/JavaScript">
     $.ajaxSetup({headers: {"X-CSRFToken": '{{ csrf_token }}'}});
 </script>
+
+
 <script>
     {#多选#}
     $("#CheckedAll").click(function () {
@@ -49,6 +56,46 @@
             $("[name=id]:checkbox").prop("checked", false);
         }
     });
-
-
 </script>
+ <script>
+
+{##}
+{#            $(function () {#}
+{#                $('.user_del').click(function () {#}
+{#                    swal({#}
+{##}
+{#                        title: "你确定删除",#}
+{#                        text: "你将无法恢复",#}
+{#                        type: "warning",#}
+{#                        showCancelButton: true,#}
+{#                        confirmButtonColor: "#DD6B55",#}
+{#                        confirmButtonText: "确定",#}
+{#                        closeOnConfirm: false#}
+{#                    }, function () {#}
+{#                        $.ajax({#}
+{#                            url: "{% url 'users:user_del' %}",#}
+{#                            type: 'POST',#}
+{#                            data: {'nid': {{ nid }} },#}
+{#                            success: function (data) {#}
+{##}
+{#                                var obj = JSON.parse(data);#}
+{#                                if (obj.status) {#}
+{#                                    swal({title: "删除", text: "已成功删除", type: "success"}, function () {#}
+{#                                        location.href = "{% url 'users:user_list' %}"#}
+{#                                    })#}
+{#                                } else {#}
+{#                                    swal("错误", "删除" + "[ " + obj.error + " ]" + "遇到错误", "error");#}
+{#                                }#}
+{#                            }#}
+{#                        });#}
+{##}
+{##}
+{#                    });#}
+{#                });#}
+{##}
+{##}
+{#            });#}
+
+
+        </script>
+

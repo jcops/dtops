@@ -1,0 +1,192 @@
+{% extends "_base.html" %}
+{% load staticfiles %}
+{% block  title %}用户详情{% endblock %}
+{% block custom_css %}
+
+{% endblock %}
+
+
+{% block  content %}
+
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-lg-10">
+            <h2>用户详情</h2>
+            <ol class="breadcrumb">
+                <li>
+                    <a href="{% url 'index' %}">主页</a>
+                </li>
+                <li>
+                    <a href="{%  url 'users:user_list' %}">用户管理</a>
+                </li>
+                <li class="active">
+                    <strong>用户详情</strong>
+                </li>
+            </ol>
+        </div>
+        <div class="col-lg-2">
+
+        </div>
+    </div>
+
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                            <li class="active">
+                                <a class="text-center"><i class="fa fa-laptop"></i>用户详情</a>
+                            </li>
+                            <li class="pull-right">
+                                <a class="btn btn-outline btn-default" href="{% url 'users:user_update' detail_list.id %} "><i
+                                        class="fa fa-edit"></i>编辑</a>
+                            </li>
+                            <li class="pull-right">
+                                <a class="btn btn-outline btn-danger  user_del">
+                                    <i class="fa fa-edit " ></i>删除
+                                </a>
+                            </li>
+
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div class="col-sm-7" style="padding-left: 0">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span class="label"><b>{{ detail_list.username }}</b></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+
+                                    <table class="table">
+                                        <tbody>
+                                        <tr>
+                                            <td  width="20%">用户ID:</td>
+                                            <td ><b>{{ detail_list.id }}</b>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td  width="20%">用户名:</td>
+                                            <td "><b>{{ detail_list.username }}</b>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td width="20%">邮箱:</td>
+                                            <td><b>{{ detail_list.email }}</b>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td width="20%">昵称:</td>
+                                            <td><b>{{ detail_list.nick_name }}</b></td>
+                                        </tr>
+
+
+                                        <tr>
+                                            <td width="20%">手机号:</td>
+                                            <td><b>{{ detail_list.mobile }}</b></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td width="20%">注册时间:</td>
+                                            <td><b>{{ detail_list.date_joined }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td width="20%">最后登录时间:</td>
+                                            <td><b>{{ detail_list.last_login }}</b></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td width="20%">是否管理员:</td>
+                                            <td><b>{% if detail_list.is_superuser == 1 %}是{% else %}否{% endif %}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td width="20%">是否激活:</td>
+                                            <td><b>{% if detail_list.is_active == 1 %}是{% else %}否{% endif %}</b></td>
+                                        </tr>
+
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> 快速修改
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table">
+                                        <tbody>
+
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock %}
+
+    {% block footer_js %}
+        <script>
+            $(function () {
+                $('.user_del').click(function () {
+                    swal({
+                        title: "你确定删除",
+                        text: "你将无法恢复",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "确定",
+                        closeOnConfirm: false
+                    }, function () {
+                        $.ajax({
+                            url: "{% url 'users:user_del'  %}",
+                            type: 'POST',
+                            data: {'nid': {{ user_list.id }}},
+                            success: function (data) {
+
+                                var obj = JSON.parse(data);
+                                if (obj.status) {
+                                    swal({title: "删除", text: "已成功删除", type: "success"}, function () {
+                                        location.href = "{% url "users:user_list" %}"
+                                    })
+                                } else {
+                                    swal("错误", "删除" + "[ " + obj.error + " ]" + "遇到错误", "error");
+                                }
+                            }
+                        });
+
+
+                    });
+                });
+
+            });
+        </script>
+    {% endblock %}
+

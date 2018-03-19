@@ -14,13 +14,14 @@
 
 <body>
 <div id="wrapper">
-    {% include '_left_nav.html' %}<!--导入侧边栏-->
+<!--导入侧边栏-->
+    {% include '_left_nav.html' %}
     <div id="page-wrapper" class="gray-bg">
+    <!--导入头部菜单-->
         {% include '_header_top.html' %}
-
+    <!--内容-->
         {% block content %}
-
-        {% endblock %}<!--内容-->
+        {% endblock %}
         {% include '_footer.html' %}
     </div>
 </div>
@@ -31,8 +32,11 @@
 </div>
 
 
-{% include '_js.html' %}
-{% block footer_js %}{% endblock %}
+    {% include "_js.html" %}
+    {% block footer_js %}{% endblock %}
+
+</body>
+</html>
 
 
 {#<script>#}
@@ -263,5 +267,3 @@
 {#    }#}
 {#</script>#}
 <!--同步官网模板结束-->
-</body>
-</html>

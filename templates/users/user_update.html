@@ -1,0 +1,89 @@
+{% extends '_base.html' %}
+{% load staticfiles %}
+    {% block title %}DtOps | 用户详情{% endblock %}
+
+
+    {% block custom_css %}
+    <link href="{% static 'css/plugins/iCheck/custom.css' %}" rel="stylesheet">
+    <link href="{% static 'css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css' %}" rel="stylesheet">
+    {% endblock %}
+
+{% block content %}
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <h5>更新用户信息 </h5>
+                            <div class="ibox-tools">
+                                <a class="collapse-link">
+                                    <i class="fa fa-chevron-up"></i>
+                                </a>
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                    <i class="fa fa-wrench"></i>
+                                </a>
+                                <ul class="dropdown-menu dropdown-user">
+                                    <li><a href="#">选项 1</a>
+                                    </li>
+                                    <li><a href="#">选项 2</a>
+                                    </li>
+                                </ul>
+                                <a class="close-link">
+                                    <i class="fa fa-times"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="ibox-content">
+
+
+
+                            <form method="post"  action="{% url 'users:user_update' user_update.id %}" class="form-horizontal">
+                                {% csrf_token %}
+                                 {% if form.no_field_errors %}
+                                        <div>{{ form.no_field_errors }}</div>
+                                {% endif %}
+
+                                <div class="hr-line-dashed"></div>
+                                <div class="form-group">
+                                    <div class="col-sm-10">{{ form.as_p }}
+
+                                    </div>
+                                </div>
+{#                                <div class="hr-line-dashed"></div>#}
+{#                                <div class="form-group"><label class="col-sm-2 control-label">密码</label>#}
+{##}
+{#                                    <div class="col-sm-10"><input type="password" class="form-control" name="password"></div>#}
+{#                                 {{ i.password }}#}
+{#                                </div>#}
+{#                                <div class="hr-line-dashed"></div>#}
+{#                                <div class="form-group"><label class="col-sm-2 control-label">昵称</label>#}
+{##}
+{#                                    <div class="col-sm-10"><input type="text" placeholder="占位符" class="form-control"></div>#}
+{#                                {{ i.nick_name }}#}
+{#                                </div>#}
+
+{#                                {% endfor %}#}
+                                <div class="form-group">
+                                    <div class="col-sm-4 col-sm-offset-2">
+                                        <button class="btn btn-white" type="submit">取消</button>
+                                        <button class="btn btn-primary" type="submit">保存更改</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+      {% endblock %}
+
+{% block footer_js %}
+    <!-- iCheck -->
+    <script src="{% static 'js/plugins/iCheck/icheck.min.js' %}"></script>
+        <script>
+            $(document).ready(function () {
+                $('.i-checks').iCheck({
+                    checkboxClass: 'icheckbox_square-green',
+                    radioClass: 'iradio_square-green',
+                });
+            });
+        </script>
+{% endblock %}
