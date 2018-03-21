@@ -304,9 +304,10 @@
 
                                 var obj = JSON.parse(data);
                                 if (obj.status) {
-                                    swal({title: "删除", text: "已成功删除", type: "success"}, function () {
+                                    swal({title: "删除", text: "已成功删除",imageUrl: "{% static 'img/thumbs-up.jpg' %}"}, function () {
                                         location.href = "{% url "users:user_list" %}"
                                     })
+
                                 } else {
                                     swal("错误", "删除" + "[ " + obj.error + " ]" + "遇到错误", "error");
                                 }
