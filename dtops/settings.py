@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'reversion',
     #分页插件
     'pure_pagination',
+    'bootstrap3',
 
 ]
 

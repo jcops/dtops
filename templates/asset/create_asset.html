@@ -1,0 +1,270 @@
+{% extends '_base.html' %}
+{% load staticfiles %}
+{% load bootstrap3 %}
+   {% block title %}DtOps | 新建资产{% endblock %}
+    {% block custom_css %}
+        <link href="{% static 'css/plugins/dataTables/datatables.min.css' %}" rel="stylesheet">
+    {% endblock %}
+
+{% block content %}
+      <div class="row wrapper border-bottom white-bg page-heading">
+                <div class="col-lg-10">
+                    <h2>新建资产</h2>
+                    <ol class="breadcrumb">
+                        <li>
+                            <a href="../index.html">总览</a>
+                        </li>
+                        <li>
+                            <a>资产管理</a>
+                        </li>
+                        <li class="active">
+                            <strong>新建资产</strong>
+                        </li>
+                    </ol>
+                </div>
+                <div class="col-lg-2">
+
+                </div>
+            </div>
+  <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>资产</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-user">
+                            <li><a href="#">选项 1</a>
+                            </li>
+                            <li><a href="#">选项 2</a>
+                            </li>
+                        </ul>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+       <div class="ibox-content " style="background-color: #ffffff">
+                        <div class="wrapper wrapper-content animated fadeInRight">
+                            <form id="js_addHostForm" method="post" class="form-horizontal"  action="{% url 'asset:asset_add' %}" >
+                                {% csrf_token %}
+                                {% if form.non_field_errors %}
+                                                             <div class="alert alert-danger" style="margin: 20px auto 0px">
+                                                                 {{ form.non_field_errors }}
+                                                             </div>
+                                {% endif %}
+
+                                                        {% csrf_token %}
+                                            <div class="form-group">
+                                                 <div class="col-sm-10 col-sm-offset-0">
+                                                        <h3>基本信息</h3>
+
+                                                       {% bootstrap_field form.hostname layout="horizontal" %}
+                                                            {% bootstrap_field form.inner_ip layout="horizontal" %}
+                                                            {% bootstrap_field form.pub_ip layout="horizontal" %}
+                                                            {% bootstrap_field form.port layout="horizontal" %}
+                                                            {% bootstrap_field form.osfinger layout="horizontal" %}
+
+                                                            {% bootstrap_field form.status layout="horizontal" %}
+                                                             {% bootstrap_field form.product layout="horizontal" %}
+                                                             {% bootstrap_field form.cloud_platform layout="horizontal" %}
+
+                                                            {% bootstrap_field form.system_user layout="horizontal" %}
+                                                             {% bootstrap_field form.tag layout="horizontal" %}
+                                                             {% bootstrap_field form.detail layout="horizontal" %}
+
+                                                 </div>
+                                            </div>
+
+
+
+
+                              <div class="hr-line-dashed">
+                              </div>      {# 中间加条横线#}
+                                <div class="form-group">
+                                    <div class="col-sm-4 col-sm-offset-3">
+                                        <button class="btn btn-white" type="submit">取消</button>
+                                        <button class="btn btn-primary" id="js_addHostBtn" type="submit">保存更改</button>
+{#                                   {% bootstrap_button "保存" button_type="submit" id="js_addHostBtn"  button_class="btn-primary" %}#}
+{##}
+{#                                <button class="btn btn-white" href="{{ i__next__ }}" >取消</button>#}
+                                    </div>
+                                </div>
+
+    </form>
+
+                    </div>
+
+            </div>
+        </div>
+  </div>
+
+      {% endblock %}
+
+{#       <div id="modal-form" class="modal fade" aria-hidden="true">#}
+{#                                <div class="modal-dialog">#}
+{#                                    <div class="modal-content">#}
+{#                                        <div class="modal-body">#}
+
+
+{#                                            <div class="row">#}
+{#                                                <div class="col-sm-10 b-r">#}
+{#                                                    <form id="js_addHostForm" method="post" class="form-horizontal"  action="{% url 'asset:asset_add' %}" >#}
+{#                                                           {% csrf_token %}#}
+
+
+
+{#                                                        {{ form.as_p }}#}
+{#                                                        {{ form.non_field_errors }}#}
+{#                                                        {{ form.errors }}#}
+{#                                                        <div class=" modal-footer ">#}
+{#                                                            <button type="reset" class="btn btn-sm btn-primary btn-minor  " data-dismiss="modal"><strong>重置</strong></button>#}
+{#                                                            <button class="btn btn-sm btn-primary pull-right " type="submit" id="jsResetPwdBtn"><strong>提交</strong></button>#}
+{#                                                             <input type="hidden" name="next" value="{{ redirect_url }}" />#}
+{#                                                            <button type="button" class="btn btn-sm btn-primary m-t-n-xs btn-sm demo1" data-dismiss="modal"><strong>取消</strong></button>#}
+{#                                                            <button type="submit" class="btn btn-sm btn-primary pull-right m-t-n-xs"><strong>提交</strong></button>#}
+{#                                                        </div>#}
+{#                                                         {% if form_list.non_field_errors %}#}
+{#                                                             <div class="alert alert-danger">#}
+{#                                                                 {{ form_list.non_field_errors }}#}
+{#                                                             </div>#}
+{#                                                        {% endif %}#}
+{##}
+{#                                                        {% csrf_token %}#}
+{#                                                        <h3>基本信息</h3>#}
+{#                                                       {% bootstrap_field form_list.hostname layout="horizontal" %}#}
+{#                                                            {% bootstrap_field form_list.inner_ip layout="horizontal" %}#}
+{#                                                            {% bootstrap_field form_list.pub_ip layout="horizontal" %}#}
+{#                                                            {% bootstrap_field form_list.port layout="horizontal" %}#}
+{#                                                            {% bootstrap_field form_list.osfinger layout="horizontal" %}#}
+{##}
+{#                                                            {% bootstrap_field form_list.status layout="horizontal" %}#}
+{#                                                             {% bootstrap_field form_list.product layout="horizontal" %}#}
+{#                                                             {% bootstrap_field form_list.cloud_platform layout="horizontal" %}#}
+{##}
+{#                                                            {% bootstrap_field form_list.system_user layout="horizontal" %}#}
+{#                                                             {% bootstrap_field form_list.tag layout="horizontal" %}#}
+{#                                                             {% bootstrap_field form_list.detail layout="horizontal" %}#}
+
+{##}
+{#                                                         {% bootstrap_field form_list.hostname layout="horizontal" %}#}
+
+
+{#                          <div class="form-group" >#}
+{##}
+{#                            <label class="col-md-3 control-label">{{ from.label_suffix }}</label>#}
+{#                            <div class="col-md-12">#}
+{#                                   {{ form_list.as_p }}#}
+{#                              <input type="text" name="pub_ip" value=""  class="form-control" placeholder="请输入服务器外网IP地址"#}
+{#                                     required="">#}
+{#                            </div>#}
+{#                          </div>#}
+
+{#                                                        {%  layout="horizontal" %}#}
+{#                                                        {% layout="horizontal" %}#}
+
+{#                                                        <div class="hr-line-dashed"></div>#}
+{#                                                        <h3>{% trans 'Auth' %}</h3>#}
+{#                                                        {% bootstrap_field form.admin_user layout="horizontal" %}#}
+{##}
+{#                                                        <div class="hr-line-dashed"></div>#}
+{#                                                        <h3>{% trans 'Node' %}</h3>#}
+{#                                                        {% bootstrap_field form.nodes layout="horizontal" %}#}
+{##}
+{#                                                        <div class="hr-line-dashed"></div>#}
+{#                                                        <h3>{% trans 'Labels' %}</h3>#}
+{#                                                        <div class="form-group {% if form.errors.labels %} has-error {% endif %}">#}
+{#                                                            <label for="{{ form.labels.id_for_label }}" class="col-md-2 control-label">{% trans 'Label' %}</label>#}
+{#                                                            <div class="col-md-9">#}
+{#                                                                <select name="labels" class="select2 labels" data-placeholder="{% trans 'Select labels' %}" style="width: 100%" multiple="" tabindex="4" id="{{ form.labels.id_for_label }}">#}
+{#                                                                    {% for name, labels in form.labels.field.queryset|group_labels %}#}
+{#                                                                    <optgroup label="{{ name }}">#}
+{#                                                                        {% for label in labels %}#}
+{#                                                                            {% if label in form.labels.initial %}#}
+{#                                                                                <option value="{{ label.id }}" selected>{{ label.value }}</option>#}
+{#                                                                            {% else %}#}
+{#                                                                                <option value="{{ label.id }}">{{ label.value }}</option>#}
+{#                                                                            {% endif %}#}
+{#                                                                        {% endfor %}#}
+{#                                                                    </optgroup>#}
+{#                                                                    {% endfor %}#}
+{#                                                                </select>#}
+{#                                                                {% if form.errors.labels %}#}
+{#                                                                    {% for e in form.errors.labels %}#}
+{#                                                                        <div class="help-block">{{ e }}</div>#}
+{#                                                                    {% endfor %}#}
+{#                                                                {% endif %}#}
+{#                                                            </div>#}
+{#                                                        </div>#}
+{##}
+{#                                                        <div class="hr-line-dashed"></div>#}
+{#                                                        <h3>{% trans 'Other' %}</h3>#}
+{#                                                        {% bootstrap_field form.comment layout="horizontal" %}#}
+{#                                                        {% bootstrap_field form.is_active layout="horizontal" %}#}
+
+
+
+{#                                                    </form>#}
+{#                                                 <div class="hr-line-dashed"></div>#}
+{#                                                        <div class="form-group">#}
+{#                                                            <div class="col-sm-4 col-sm-offset-2">#}
+{#                                                                <button class="btn btn-default" type="reset">重置</button>#}
+{#                                                                <button id="submit_button" class="btn btn-primary" id="js_addHostBtn" type="submit">提交</button>#}
+{#                                                            </div>#}
+{#                                                        </div>#}
+{#                                                  </div>#}
+{#                                                </div>#}
+
+{#                                    </div>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+
+
+
+{% block footer_js %}
+<!-- 添加记录提交 -->
+  <script>
+      $(function () {
+          // 提交表单
+          $('#js_addHostBtn').on('click', function () {
+              $.ajax({
+                  cache: false,
+                  type: "POST",
+                  url: "{% url 'asset:asset_add' %}",
+                  data: $('#js_addHostForm'),
+                  async: true,
+                  success: function (data) {
+                      if (data.status == 'success') {
+                          window.location.href = "{% url 'asset:asset_list' %}";
+                          window.alert(data.msg);
+                      } else if (data.status == 'fail') {
+                              window.location.reload();
+
+                      }
+                  }
+              });
+          });
+      })
+  </script>
+    <script>
+    $(document).ready(function () {
+    $('.select2').select2({
+        allowClear: true
+    });
+    $(".labels").select2({
+        allowClear: true,
+        templateSelection: format
+    });
+})
+    </script>
+{% endblock %}

@@ -59,7 +59,7 @@ class System_User(models.Model):
     detail = models.CharField(max_length=100,null=True,blank=True,verbose_name='备注')
 
     def __str__(self):
-        return self.name
+        return '《{0}》>>《用户名:{1}》'.format(self.name, self.username)
 
     class Meta:
         verbose_name = '系统用户'
@@ -112,7 +112,7 @@ class Cloud_Platform(models.Model):
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True,verbose_name='更新时间')
 
     def __str__(self):
-        return self.name
+        return self.cloud
 
     class Meta:
         verbose_name = '云平台'

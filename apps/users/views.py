@@ -9,12 +9,13 @@ import json
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin,PermissionRequiredMixin
 from django.utils.decorators import method_decorator
+from django.contrib.auth.hashers import check_password
 
 from pure_pagination import Paginator, EmptyPage, PageNotAnInteger
 
 
 from users.models import UserProfile,UserLog
-from  users.forms import LoginForm,UserCreateForm,UserUpdateModelForm
+from  users.forms import LoginForm,UserCreateForm,UserUpdateModelForm,UpdatePasswordForm
 from utils.get_ip import Get_Ip
 # # Create your views here.
 
@@ -44,7 +45,7 @@ class LoginView(View):
                 login(request, user)
                 # request.session['is_login']=request.user
                 request.session["username"] = request.user.id
-                request.session.set_expiry(600)
+                # request.session.set_expiry(600)
                 # 跳转到首页 user request会被带回到首页
                 login_ip = request.META.get("REMOTE_ADDR","unknown")
                 login_agent = request.META.get("HTTP_USER_AGENT","unknown")
@@ -211,8 +212,41 @@ class UserUpdateView(LoginRequiredMixin,UpdateView):
     form_class = UserUpdateModelForm
     template_name = 'users/user_update.html'
     context_object_name = 'user_update'
+
     success_url = reverse_lazy('users:user_list')
+
     def get_context_data(self, **kwargs):
         return  super(UserUpdateView,self).get_context_data(**kwargs)
+
+
     def form_valid(self, form):
         return  super(UserUpdateView,self).form_valid(form)
+
+
+class UpdateUserView(LoginRequiredMixin,View):
+    '''修改密码'''
+    def get(self,request):
+        form = UpdatePasswordForm()
+        return render(request,'users/rest_password.html',{"form":form})
+
+
+    def post(self,request):
+        form = UpdatePasswordForm(request.POST)
+        if form.is_valid():
+            pwd = UserProfile.objects.get(username=request.user)
+            pwd_pwd = pwd.password
+            old_pass = check_password(form.cleaned_data['old_password'],pwd_pwd)
+            if old_pass:
+                if form.cleaned_data['new_password'] == form.cleaned_data['confirm_password']:
+                    pwd.set_password(form.cleaned_data['confirm_password'])
+                    pwd.save()
+                    return render(request,'users/rest_password.html',{"form":form,'msg':'密码修改成功'})
+                else:
+                    form = UpdatePasswordForm()
+                return render(request, 'users/rest_password.html', {"form": form, 'msg': '两次密码输入不一致'})
+            else:
+                form = UpdatePasswordForm()
+            return render(request, 'users/rest_password.html', {"form": form, 'msg': '旧密码输入错误'})
+        else:
+            form = UpdatePasswordForm()
+        return render(request, 'users/rest_password.html', {"form": form, 'msg': '输入非法请检查'})

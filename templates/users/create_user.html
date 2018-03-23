@@ -1,19 +1,19 @@
 {% extends '_base.html' %}
 {% load staticfiles %}
-
+{% load bootstrap3 %}
    {% block title %}DtOps | 用户列表{% endblock %}
     {% block custom_css %}
-        <link href="{% static 'css/plugins/dataTables/datatables.min.css' %}" rel="stylesheet"
-              xmlns="http://www.w3.org/1999/html">
+        <link href="{% static 'css/plugins/dataTables/datatables.min.css' %}" rel="stylesheet">
     {% endblock %}
 
 {% block content %}
+        {#    面包屑#}
       <div class="row wrapper border-bottom white-bg page-heading">
                 <div class="col-lg-10">
                     <h2>新建用户</h2>
                     <ol class="breadcrumb">
                         <li>
-                            <a href="../index.html">总览</a>
+                            <a href="{% url 'index' %}">总览</a>
                         </li>
                         <li>
                             <a>用户管理</a>
@@ -27,37 +27,62 @@
 
                 </div>
             </div>
+{#表单#}
+  <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>用户</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-user">
+                            <li><a href="#">选项 1</a>
+                            </li>
+                            <li><a href="#">选项 2</a>
+                            </li>
+                        </ul>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
 
-{#       <div id="modal-form" class="modal fade" aria-hidden="true">#}
-{#                                <div class="modal-dialog">#}
-{#                                    <div class="modal-content">#}
-{#                                        <div class="modal-body">#}
-                                            <div class="row">
-                                                <div class="col-sm-12 b-r"><h3 class="m-t-none m-b">用户创建</h3>
-                                                    <form id="jsResetPwdForm" role="form" method="post" action="{% url 'users:create_user' %}" autocomplete="off">
-                                                           {% csrf_token %}
-                                                        {{ form.as_p }}
-                                                        {{ form.non_field_errors }}
-                                                        {{ form.errors }}
-                                                        <div class=" modal-footer ">
-                                                            <button type="reset" class="btn btn-sm btn-primary btn-minor  " data-dismiss="modal"><strong>重置</strong></button>
-                                                            <button class="btn btn-sm btn-primary pull-right " type="submit" id="jsResetPwdBtn"><strong>提交</strong></button>
-                                                             <input type="hidden" name="next" value="{{ redirect_url }}" />
-{#                                                            <button type="button" class="btn btn-sm btn-primary m-t-n-xs btn-sm demo1" data-dismiss="modal"><strong>取消</strong></button>#}
-{#                                                            <button type="submit" class="btn btn-sm btn-primary pull-right m-t-n-xs"><strong>提交</strong></button>#}
-                                                        </div>
+                    <form enctype="multipart/form-data" method="post" class="form-horizontal" action="">
+                        {% csrf_token %}
+                        {% if form.no_field_errors %}
+                            <div class="alert alert-danger" style="margin: 20px auto 0px">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
 
-                                                    </form>
-                                                </div>
-                                        </div>
-{#                                    </div>#}
-{#                                    </div>#}
-{#                                </div>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                </div>#}
-{#            </div>#}
-{#        </div>#}
+                        <div class="form-group">
+                            <div class="col-sm-10 col-sm-offset-0">
+                                <h3>基本</h3>
+                                {% bootstrap_field form.username layout="horizontal" %}
+                                {% bootstrap_field form.nick_name layout="horizontal" %}
+                                {% bootstrap_field form.password layout="horizontal" %}
+                                {% bootstrap_field form.email layout="horizontal" %}
+                                {% bootstrap_field form.mobile layout="horizontal" %}
 
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>      {# 中间加条横线#}
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-3">
+                                {% bootstrap_button "提交" button_type="submit" button_class="btn-primary " %}
+                                <button class="btn  btn-default btn-add" >取消</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
 
+    </div>
 {% endblock %}

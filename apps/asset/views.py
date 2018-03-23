@@ -78,10 +78,31 @@ class ProductLineListAllView(LoginRequiredMixin,ListView):
         return super(ProductLineListAllView,self).get_context_data(**kwargs)
 
 
-class AddAssetView(LoginRequiredMixin,View):
+# class AddAssetView(View):
+#     def get(self,request):
+#         form_list = AddAssetModelForm()
+#         return  render(request,'asset/create_asset.html',locals())
+#
+#     def post(self, request):
+#         form_list = AddAssetModelForm(request.POST)
+#         if form_list.is_valid():
+#             add_host = form_list.cleaned_data['inner_ip']
+#             if Asset.objects.get(inner_ip=add_host):
+#                 return HttpResponse('{"status":"fail", "msg":"记录已存在！"}', content_type='application/json')
+#
+#             else:
+#                 a = Asset()
+#                 a.hostname = form_list.cleaned_data['hostname']
+#                 a.inner_ip = form_list.cleaned_data['inner_ip']
+#                 a.pub_ip = form_list.cleaned_data['pub_ip']
+#                 a.save()
+#             return HttpResponse('{"status":"success", "msg":"记录添加成功！"}', content_type='application/json')
+#         else:
+#             return HttpResponse('{"status":"fail", "msg":"记录添加失败！"}', content_type='application/json')
 
-    def get(self,request):
-        add_list = AddAssetModelForm()
-
-    def post(self,request):
-        add_list = request.POST.get('nid','')
+class AddAssetView(LoginRequiredMixin,CreateView):
+    model = Asset
+    form_class = AddAssetModelForm
+    context_object_name = 'form_list'
+    template_name = 'asset/create_asset.html'
+    success_url = reverse_lazy('asset:asset_list')

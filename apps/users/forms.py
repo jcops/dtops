@@ -21,26 +21,26 @@ class LoginForm(forms.Form):
 
 class UserCreateForm(forms.ModelForm):
 
-    username = forms.CharField(required=True, label="用户名",
+    username = forms.CharField(required=True, label="用户名:",
                                error_messages={'required': '用户名不能为空'},
-                               max_length=15,
+                               max_length=15,help_text='*必填',
                                widget=forms.TextInput(attrs={'class':'form-control','placeholder': u"用户名"}))
 
-    nick_name = forms.CharField(label="昵称",
+    nick_name = forms.CharField(label="昵称;",help_text='可不填',
                                 widget=forms.TextInput(attrs={'class': 'form-control','placeholder':'昵称'}))
 
-    password = forms.CharField(required=True, label="密码",
+    password = forms.CharField(required=True, label="密码:",
                                error_messages={'required': '密码不能为空',},
-                               max_length=20,
+                               max_length=20,help_text='*必填',
                                widget=forms.PasswordInput(attrs={'class':'form-control','placeholder': "密码"}))
 
-    mobile = forms.CharField(required=True,label="手机号",
+    mobile = forms.CharField(required=True,label="手机号:",
                              error_messages={'required': '手机号不能为空'},
-                             max_length=11,
+                             max_length=11,help_text='*必填',
                              widget=forms.TextInput(attrs={'class': 'form-control','placeholder':'手机号'}))
     #
-    email = forms.EmailField(required=True,label='邮箱',
-                             error_messages={'required': '邮箱不能为空'},
+    email = forms.EmailField(required=True,label='邮箱:',
+                             error_messages={'required': '邮箱不能为空'},help_text='*必填',
                              widget=forms.EmailInput(attrs={'class':'form-control','placeholder': u"邮箱"}))
     # username = forms.CharField()
     class Meta:
@@ -73,7 +73,7 @@ class UserCreateForm(forms.ModelForm):
 
 
 class UserUpdateModelForm(forms.ModelForm):
-
+    '''用户资料更新'''
     class Meta:
         model = UserProfile
         fields = ['nick_name','username','email','mobile','is_superuser','is_active','is_staff',]
@@ -92,3 +92,37 @@ class UserUpdateModelForm(forms.ModelForm):
             # 'is_staff': forms.ChoiceField(attrs={'class': 'form-control'}),
 
         }
+class UpdatePasswordForm(forms.Form):
+    '''修改密码'''
+    # old_password = forms.CharField(
+    #     widget=forms.PasswordInput,
+    #     min_length=5,
+    #     max_length=20,
+    #     help_text='*必填',
+    #     error_messages='密码不能为空',
+    #     label='旧密码:',
+    # )
+    # new_password = forms.CharField(
+    #     widget=forms.PasswordInput,
+    #     min_length=5,
+    #     max_length=20,
+    #     help_text='*必填',
+    #     error_messages='密码不能为空',
+    #     label='新密码:',
+    # )
+    # confirm_password = forms.CharField(
+    #     widget=forms.PasswordInput,
+    #     min_length=5,
+    #     max_length=20,
+    #     help_text='*必填',
+    #     error_messages='密码不能为空',
+    #     label='确认密码:',
+    # )
+
+    # )
+    old_password = forms.CharField(
+        max_length=128, widget=forms.PasswordInput,label='旧密码')
+    new_password = forms.CharField(
+        min_length=5, max_length=128, widget=forms.PasswordInput,label='新密码',help_text="* 最少为5个字符")
+    confirm_password = forms.CharField(
+        min_length=5, max_length=128, widget=forms.PasswordInput,label='确认密码',help_text="* 最少为5个字符")

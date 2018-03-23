@@ -2,7 +2,7 @@ from django.conf.urls import url
 
 
 from  users.views import UserListView,logoutview,LoginView,UserCreateView, \
-                         UserDeleteView,UserHistoryView,UserDeatilView,UserUpdateView,UserDelView
+                         UserDeleteView,UserHistoryView,UserDeatilView,UserUpdateView,UserDelView,UpdateUserView
 
 app_name = 'users'
 urlpatterns = [
@@ -24,5 +24,7 @@ urlpatterns = [
     url(r'user_detail/(?P<pk>\d+)/$', UserDeatilView.as_view(), name='user_detail'),
     #用户更新
     url(r'user_update/(?P<pk>\d+)/$', UserUpdateView.as_view(), name='user_update'),
+    # 用户更新
+    url(r'pwd_update/$', UpdateUserView.as_view(), name='pwd_update'),
 
 ]
