@@ -2,7 +2,7 @@
 {% extends '_base.html' %}
 {% load staticfiles %}
 {% load bootstrap3 %}
-    {% block title %}DtOps | 更新用户{% endblock %}
+    {% block title %}DtOps | 更新资产{% endblock %}
    {% block custom_css %}
     <link href="{% static 'css/plugins/iCheck/custom.css' %}" rel="stylesheet">
     <link href="{% static 'css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css' %}" rel="stylesheet">
@@ -14,14 +14,14 @@
                     <div class="panel-options">
                         <ul class="nav nav-tabs">
                             <li class="active">
-                                <a href="" class="text-center">更新用户 </a>
+                                <a href="" class="text-center">更新资产 </a>
                             </li>
                         </ul>
                     </div>
                   <div class="hr-line-dashed"></div>      {# 中间加条横线#}
                         <div class="ibox-content " style="background-color: #ffffff">
                         <div class="wrapper wrapper-content animated fadeInRight">
-                            <form method="post" action="{% url 'users:user_update' user_update.id %}"  enctype="multipart/form-data" class="form-horizontal">
+                            <form method="post" action="{% url 'asset:asset_update' asset_update.id %}"  enctype="multipart/form-data" class="form-horizontal">
                                 {% csrf_token %}
                                  {% if form.no_field_errors %}
                                         <div>{{ form.no_field_errors }}</div>
@@ -30,10 +30,31 @@
                                <div class="form-group">
                                     <div class="col-sm-10 col-sm-offset-0">
 {#                                        {{ msg }}#}
-                                        {% bootstrap_field form.nick_name layout="horizontal" %}
-                                        {% bootstrap_field form.username layout="horizontal" %}
-                                        {% bootstrap_field form.email layout="horizontal" %}
-                                                {% bootstrap_field form.mobile layout="horizontal" %}
+                                        {% bootstrap_field form.hostname layout="horizontal" %}
+                                        {% bootstrap_field form.inner_ip layout="horizontal" %}
+                                        {% bootstrap_field form.pub_ip layout="horizontal" %}
+                                         {% bootstrap_field form.port layout="horizontal" %}
+                                           {% bootstrap_field form.mem_total layout="horizontal" %}
+                                           {% bootstrap_field form.disk_total layout="horizontal" %}
+                                           {% bootstrap_field form.cpu_model layout="horizontal" %}
+                                           {% bootstrap_field form.num_cpus layout="horizontal" %}
+                                           {% bootstrap_field form.osfinger layout="horizontal" %}
+                                         {% bootstrap_field form.osrelease layout="horizontal" %}
+                                           {% bootstrap_field form.dns layout="horizontal" %}
+                                           {% bootstrap_field form.mac_addr layout="horizontal" %}
+                                           {% bootstrap_field form.kernelrelease layout="horizontal" %}
+                                           {% bootstrap_field form.serialnumber layout="horizontal" %}
+                                           {% bootstrap_field form.virtual layout="horizontal" %}
+                                           {% bootstrap_field form.status layout="horizontal" %}
+                                         {% bootstrap_field form.detail layout="horizontal" %}
+                                         {% bootstrap_field form.system_user layout="horizontal" %}
+                                         {% bootstrap_field form.product layout="horizontal" %}
+                                         {% bootstrap_field form.tag layout="horizontal" %}
+                                        {% bootstrap_field form.cloud_platform layout="horizontal" %}
+                                        {% bootstrap_field form.create_user layout="horizontal" %}
+
+
+
 
 
 

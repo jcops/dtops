@@ -119,6 +119,14 @@ class UserCreateView(LoginRequiredMixin,View):
         return render(request,'users/create_user.html',
                       {"form":form,
                       })
+    def get_context_data(self, **kwargs):
+        context = {
+            "user_active": "active",
+            "user_list_active": "active",
+
+        }
+        kwargs.update(context)
+        return super(UserCreateView, self).get_context_data(**kwargs)
 
     def post(self,request):
         form = UserCreateForm(request.POST)
@@ -198,7 +206,10 @@ class UserDeatilView(LoginRequiredMixin,DetailView):
     def get_context_data(self, **kwargs):
         pk = self.kwargs.get(self.pk_url_kwarg, None)
         detail = UserProfile.objects.get(id=pk)
+
         context = {
+            "user_active": "active",
+            "user_list_active": "active",
             "detail_list":detail,
             "user_list":detail,
             "nid": pk,
@@ -213,10 +224,25 @@ class UserUpdateView(LoginRequiredMixin,UpdateView):
     template_name = 'users/user_update.html'
     context_object_name = 'user_update'
 
+
     success_url = reverse_lazy('users:user_list')
 
+    # def get_form_kwargs(self):
+    #     kwargs = super(UserUpdateView, self).get_form_kwargs()
+    #     kwargs.update({
+    #         'user': self.request.user
+    #     })
+    #     return kwargs
+
     def get_context_data(self, **kwargs):
+        context = {
+            "user_active": "active",
+            "user_list_active": "active",
+
+        }
+        kwargs.update(context)
         return  super(UserUpdateView,self).get_context_data(**kwargs)
+
 
 
     def form_valid(self, form):
@@ -228,7 +254,14 @@ class UpdateUserView(LoginRequiredMixin,View):
     def get(self,request):
         form = UpdatePasswordForm()
         return render(request,'users/rest_password.html',{"form":form})
+    def get_context_data(self, **kwargs):
+        context = {
+            "user_active": "active",
+            "user_list_active": "active",
 
+        }
+        kwargs.update(context)
+        return super(UpdateUserView, self).get_context_data(**kwargs)
 
     def post(self,request):
         form = UpdatePasswordForm(request.POST)
