@@ -26,7 +26,7 @@ SECRET_KEY = 'k66z%xs8yn5t7!x*orb22wz#3-5+5xncraylv5zs#n5k2y4!6*'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*',]
 
 
 # Application definition
@@ -148,3 +148,6 @@ PAGINATION_SETTINGS = {
 
     'SHOW_FIRST_PAGE_WHEN_INVALID': True,
 }
+
+web_ssh = "127.0.0.1"
+web_port = 8002

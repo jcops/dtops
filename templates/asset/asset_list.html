@@ -4,8 +4,39 @@
 {% block title %}DtOps | 资产列表{% endblock %}
 {% block custom_css %}
     <link href="{% static 'css/plugins/dataTables/datatables.min.css' %}" rel="stylesheet">
+     <link href="{% static 'webssh_static/css/fullscreen.min.css' %}" rel="stylesheet">
+     <link href="{% static 'webssh_static/css/xterm.min.css' %}" rel="stylesheet">
 {#        <script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>#}
+
+        <style type="text/css">
+
+
+        div#rMenu {
+            position: absolute;
+            visibility: hidden;
+            text-align: left;
+            top: 100%;
+            left: 0;
+            z-index: 1000;
+            float: left;
+            padding: 5px 0;
+            margin: 2px 0 0;
+            list-style: none;
+            background-clip: padding-box;
+        }
+
+        div#rMenu li {
+            margin: 1px 0;
+            cursor: pointer;
+        {#list-style: none outside none;#}
+        }
+
+        .dropdown a:hover {
+            background-color: #f1f1f1
+        }
+    </style>
 {% endblock %}
+
 
 {% block content %}
     <div class="row wrapper border-bottom white-bg page-heading">
@@ -125,6 +156,8 @@
                         <td class=" text-center">
                             <a href="{% url 'asset:asset_detail' asset_list.id %}" class="btn btn-xs btn-info">详情</a>
                             <button class="btn btn-xs btn-danger m-l-xs asset_del" id="{{ asset_list.id }}">删除</button>
+{#                             <button class="btn btn-xs btn-info asset_in" id="{{ asset_list.id }}">终端</button>#}
+                            <a type="button" class="btn btn-primary btn-xs webssh" id="{{ asset_list.id }}">终端</a>
 
                             {#              <button class="btn btn-xs btn-danger m-l-xs system_user_del" id="{{ user_list.id }}">删除</button>#}
                         </td>
@@ -168,8 +201,12 @@
 
 
 {% block footer_js %}
-
+    <script src="{% static 'webssh_static/js/xterm.min.js' %}"></script>
+    <script src="{% static 'webssh_static/js/fullscreen.min.js' %}"></script>
+        <script src="{% static 'webssh_static/js/popper.min.js' %}"></script>
+    <script src="{% static 'webssh_static/js/main.js' %}"></script>
     <script src="{% static 'js/plugins/dataTables/datatables.min.js' %}"></script>
+
 {#    <script src="{% static 'js/plugins/iCheck/icheck.min.js' %}"></script>#}
 
 
@@ -245,6 +282,104 @@
                                 }
                             }
                         });
+                    });
+                });
+            });
+                jQuery(function ($) {
+                $(document).on('click', '.webssh', function (event) {
+
+                    event.preventDefault();
+
+                    var id_a =$(this).attr('id');
+
+                    $.ajax({
+                        headers: {"X-CSRFToken": '{{ csrf_token }}'},
+                        url: "{% url 'asset:asset_web' %}",
+                        type: 'POST',
+                        data: {'id': id_a},
+                        success: function (ret) {
+
+                            var obj = JSON.parse(ret);
+                            var ips =  obj.ip;
+                            var ports = obj.port;
+                            var usernames = obj.username;
+                            var passwords = obj.password;
+{#                            var privatekey = obj.privatekey;#}
+
+                            $.ajax({
+                                url: "http://{{ web_ssh }}:{{ web_port }}/",
+                                type: 'POST',
+                                data: {
+                                    hostname: ips,
+                                    port: ports,
+                                    username: usernames,
+                                    password: passwords,
+{#                                    privatekey: privatekey#}
+                                },
+                                crossDomain: true,
+                                success: callback
+                            });
+
+                            function current_geometry() {
+                                cols = parseInt(window.innerWidth / 10);
+                                rows = parseInt(window.innerHeight / 24);
+                                return [cols, rows];
+                            }
+
+
+                            function callback(msg) {
+                                console.log(msg);
+                                if (msg.status) {
+                                    swal("错误", "登陆" + "[ " + msg.status + " ]" + "遇到错误", "error");
+                                    return;
+                                }
+
+
+                                var url = "ws://{{ web_ssh }}:{{ web_port }}/" + 'ws?id=' + msg.id,
+                                    socket = new WebSocket(url),
+                                    terminal = document.getElementById('#terminal'),
+                                    geometry = current_geometry();
+                                term  =  new Terminal({cursorBlink: true, cols: geometry[0], rows: geometry[1]});
+
+                                console.log(url);
+                                term.on('data', function (data) {
+                                    // console.log(data);
+                                    socket.send(data);
+                                });
+
+                                socket.onopen = function (e) {
+                                    $('.container1').hide();
+                                    term.open(terminal, true);
+                                    term.toggleFullscreen(true);
+                                };
+
+                                socket.onmessage = function (msg) {
+                                    console.log(msg);
+                                    term.write(msg.data);
+                                };
+
+                                socket.onerror = function (e) {
+                                    console.log(e);
+                                };
+
+                                socket.onclose = function (e) {
+                                    console.log(e);
+                                    term.destroy();
+                                    $('.container1').show();
+                                    // status.text(e.reason);
+                                };
+                            }
+
+
+                            $(window).resize(function () {
+                                if (typeof term != "undefined") {
+                                    geometry = current_geometry();
+                                    term.geometry = geometry;
+                                    term.resize(geometry[0], geometry[1]);
+                                }
+                            });
+
+                        }
                     });
                 });
             });

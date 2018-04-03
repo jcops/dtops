@@ -5,7 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 import json
 from  pure_pagination import PageNotAnInteger,Paginator,EmptyPage
-
+from  dtops import settings
 from  .models import Asset,System_User,ProductLine,Cloud_Platform,Tag
 from .forms import AddAssetModelForm,AssetUpdateModelForm
 from utils.Saltapi import SaltAPI
@@ -33,6 +33,8 @@ class AssetListView(LoginRequiredMixin,ListView):
             "asset_list_active": "active",
             "asset_list":asset_list,
             # "form_list":form_list,
+            "web_ssh": getattr(settings, 'web_ssh'),
+            "web_port": getattr(settings, 'web_port'),
 
         }
         kwargs.update(context)
@@ -203,4 +205,30 @@ class auto_update_assets(View):
             ret = {"status": False, "error": False}
         return HttpResponse(json.dumps(ret))
 
+import traceback
+class AssetWebView(LoginRequiredMixin,View):
+    '''
+    终端登录
+    '''
+    def post(self,request,*args,**kwargs):
+        ret = {'status':True,}
+        try:
+            id = request.POST.get('id',None)
+            print(id)
+            obj = Asset.objects.get(id=id)
+            print(obj)
+            ip = obj.pub_ip
+
+            port = obj.port
+            username = obj.system_user.username
+            password = obj.system_user.password
+            print(ip,port,username,password)
+            ret.update({"ip":ip,"port":port,"username":username,"password":password})
+        except Exception as e:
+            traceback.print_exc()
+            ret['status'] = False
+            ret['error'] = "请求错误,{}".format(e)
+            print(ret['error'])
+        finally:
+            return HttpResponse(json.dumps(ret))
 

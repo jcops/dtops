@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
 
-from  .views import AssetListView,SystemUserListAllView,ProductLineListAllView,AddAssetView,DelAssetView,AssetDetailView,AssetUpdateView,auto_update_assets
+from  .views import AssetListView,SystemUserListAllView,ProductLineListAllView,AddAssetView,DelAssetView,AssetDetailView,AssetUpdateView,auto_update_assets,AssetWebView
 
 app_name = 'asset'
 urlpatterns = [
@@ -20,6 +20,8 @@ urlpatterns = [
     #产品线列表
     url(r'product_list/$', ProductLineListAllView.as_view(), name='product_list'),
 
-    # 产品线列表
+    # 刷新全部资产
     url(r'auto_update_assets/$', auto_update_assets.as_view(), name='assets_update'),
+    # 资产终端
+    url(r'assetweb/$', AssetWebView.as_view(), name='asset_web'),
 ]
