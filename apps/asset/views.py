@@ -8,6 +8,10 @@ from  pure_pagination import PageNotAnInteger,Paginator,EmptyPage
 
 from  .models import Asset,System_User,ProductLine,Cloud_Platform,Tag
 from .forms import AddAssetModelForm,AssetUpdateModelForm
+from utils.Saltapi import SaltAPI
+from utils.retasset import auto_asset
+
+salt = SaltAPI(url="https://118.25.39.84:8000", user="saltapi", password="saltapi123")
 # Create your views here.
 
 class AssetListView(LoginRequiredMixin,ListView):
@@ -169,3 +173,34 @@ class AssetUpdateView(LoginRequiredMixin,UpdateView):
         }
         kwargs.update(context)
         return super(AssetUpdateView,self).get_context_data(**kwargs)
+
+
+class auto_update_assets(View):
+    def post(self,request):
+        ret = {"status": True, "error": False}
+        try:
+            if self.request.POST.get('all') == 'all':
+                ass =Asset.objects.all()
+                for ii in ass:
+                    asset_info = auto_asset(ii.inner_ip)
+                    asset = Asset.objects.get(inner_ip=ii.inner_ip)
+                    asset.osfinger = asset_info['os']
+                    asset.hostname = asset_info['localhost']
+                    asset.cpu_model = asset_info['cpu_model']
+                    asset.mac_addr = asset_info['hwaddr_interfaces']
+                    asset.mem_total = asset_info['mem_total']
+                    asset.num_cpus = asset_info['num_cpus']
+                    asset.virtual = asset_info['virtual']
+                    asset.serialnumber = asset_info['serialnumber']
+                    asset.dns = asset_info['dns']
+                    asset.kernelrelease = asset_info['kernelrelease']
+                    asset.inner_ip = asset_info['ip4_interfaces']
+                    for de, di in asset_info['disks'].items():
+                        #{'avail': '40.05', 'total': '49.09G', 'capacity': '15%', 'used': '6.54'}
+                        asset.disk_total = ''.join(de + '=' + di['total'])
+                    asset.save()
+        except Exception:
+            ret = {"status": False, "error": False}
+        return HttpResponse(json.dumps(ret))
+
+

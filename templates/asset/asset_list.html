@@ -31,6 +31,7 @@
     <div class="ibox-content">
         <div class="" id="content_start">
             <div class="html5buttons">
+
                 <div class="dt-buttons btn-group">
                     <a class="btn btn-default btn_import" data-toggle="modal" data-target="#user_import_modal"
                        tabindex="0">
@@ -46,6 +47,11 @@
 
         <div class="uc pull-left m-r-5">
             <a href="{% url 'asset:asset_add' %}" class="btn btn-sm btn-primary">新建资产 </a>
+        </div>
+
+            <div class="uc pull-left m-r-4">
+                 <button class="btn btn-sm btn-primary assets_update" >刷新资产</button>
+
         </div>
 {#        <a class="btn btn-sm btn-default btn-add" data-toggle="modal" data-target="#AddHostModal" data-backdrop='static'>#}
 {#                    <i class="fa fa-plus"></i> 添加主机#}
@@ -78,8 +84,8 @@
                     <th class="text-center sorting">端口</th>
                     <th class="text-center sorting">内存</th>
                     <th class="text-center sorting">磁盘</th>
-                    <th class="text-center sorting">CPU核数</th>
                     <th class="text-center sorting">系统版本</th>
+                    <th class="text-center sorting">CPU核数</th>
                     <th class="text-center sorting">状态</th>
                      <th class="text-center sorting">产品线</th>
 {#                    <th class="text-center sorting">备注</th>#}
@@ -197,6 +203,45 @@
 
                                 } else {
                                     swal("错误", "删除" + "[ " + obj.error + " ]" + "遇到错误", "error");
+                                }
+                            }
+                        });
+                    });
+                });
+            });
+        </script>
+
+
+
+     <script>
+            $(function () {
+                $('.assets_update').click(function () {
+{#                    var nid = $(this).attr('id');#}
+{#                        console.log(nid);#}
+                    swal({
+                        title: "你确定更新全部资产信息吗",
+{#                        text: "你将无法恢复",#}
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "确定",
+                        closeOnConfirm: false
+                    }, function () {
+
+                        $.ajax({
+                            url: "{% url 'asset:assets_update'  %}",
+                            type: 'POST',
+                            data: {'all': 'all' },
+                            success: function (data) {
+
+                                var obj = JSON.parse(data);
+                                if (obj.status) {
+                                    swal({title: "更新", text: "已更新资产信息",imageUrl: "{% static 'img/thumbs-up.jpg' %}"}, function () {
+                                        location.href = "{% url "asset:asset_list" %}"
+                                    })
+
+                                } else {
+                                    swal("错误", "更新" + "[ " + obj.error + " ]" + "遇到错误", "error");
                                 }
                             }
                         });
