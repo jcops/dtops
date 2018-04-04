@@ -1,11 +1,15 @@
 {% extends '_base.html' %}
 {% load staticfiles %}
+{% load  bootstrap3 %}
+{% load  static %}
 
 {% block title %}DtOps | 资产列表{% endblock %}
 {% block custom_css %}
-    <link href="{% static 'css/plugins/dataTables/datatables.min.css' %}" rel="stylesheet">
-     <link href="{% static 'webssh_static/css/fullscreen.min.css' %}" rel="stylesheet">
-     <link href="{% static 'webssh_static/css/xterm.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/plugins/dataTables/datatables.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'webssh_static/css/xterm.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'webssh_static/css/fullscreen.min.css' %}" rel="stylesheet" type="text/css" />
+
+
 {#        <script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>#}
 
         <style type="text/css">
@@ -167,6 +171,10 @@
                     </tbody>
                     {#    <div class="row m-t"><div class="col-md-8"><div id="op" class="col-md-6">#}
             </table>
+{#        <div class="container">#}
+{#      <div id="status" style="color: red;"></div>#}
+{#      <div id="terminal"></div>#}
+{#    </div>#}
          <div>
              <ul class="pagination pull-right">
                                         {% if asset_list.has_previous %}
@@ -285,7 +293,10 @@
                     });
                 });
             });
-                jQuery(function ($) {
+
+        </script>
+    <script>
+           jQuery(function ($) {
                 $(document).on('click', '.webssh', function (event) {
 
                     event.preventDefault();
@@ -304,8 +315,7 @@
                             var ports = obj.port;
                             var usernames = obj.username;
                             var passwords = obj.password;
-{#                            var privatekey = obj.privatekey;#}
-
+                            var privatekey = obj.privatekey;
                             $.ajax({
                                 url: "http://{{ web_ssh }}:{{ web_port }}/",
                                 type: 'POST',
@@ -314,7 +324,7 @@
                                     port: ports,
                                     username: usernames,
                                     password: passwords,
-{#                                    privatekey: privatekey#}
+                                    privatekey: privatekey
                                 },
                                 crossDomain: true,
                                 success: callback
@@ -343,7 +353,7 @@
 
                                 console.log(url);
                                 term.on('data', function (data) {
-                                    // console.log(data);
+                                    console.log(data);
                                     socket.send(data);
                                 });
 
@@ -376,6 +386,9 @@
                                     geometry = current_geometry();
                                     term.geometry = geometry;
                                     term.resize(geometry[0], geometry[1]);
+                                      console.log(geometry);
+
+
                                 }
                             });
 
@@ -383,7 +396,7 @@
                     });
                 });
             });
-        </script>
+    </script>
 {# <!-- 添加记录提交 -->#}
 {#  <script>#}
 {#      $(function () {#}

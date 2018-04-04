@@ -18,15 +18,15 @@
 <link href="{% static 'js/plugins/gritter/jquery.gritter.css' %}" rel="stylesheet">
 
 <!-- Sweet alert -->
-<link href="{% static  "css/plugins/sweetalert/sweetalert.css"%}" rel="stylesheet">
+<link href="{% static  'css/plugins/sweetalert/sweetalert.css'%}" rel="stylesheet">
 
-<link href="{% static  "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
+<link href="{% static  'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
     {% block custom_css %}{% endblock %}
     {% block custom_js %}{% endblock %}
 </head>
 
 <body>
-<div id="wrapper">
+<div id="wrapper" class="container1">
 <!--导入侧边栏-->
     {% include '_left_nav.html' %}
     <div id="page-wrapper" class="gray-bg">
@@ -79,17 +79,18 @@
 {#<!-- Toastr -->#}
 <script src="{% static 'js/plugins/toastr/toastr.min.js' %}"></script>
 {#<!-- Sparkline demo data  -->#}
-<script src="{% static 'js/demo/sparkline-demo.js' %}"></script>
+{#<script src="{% static 'js/demo/sparkline-demo.js' %}"></script>#}
 
 <!-- Sweet alert -->
 <script src="{% static 'js/plugins/sweetalert/sweetalert.min.js' %}"></script>
 <!-- 下拉框 -->
 <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
-    {% block footer_js %}{% endblock %}
+    {% block footer_js %}
 
 <script type="text/JavaScript">
     $.ajaxSetup({headers: {"X-CSRFToken": '{{ csrf_token }}'}});
 </script>
+{% endblock %}
 
 
 <script>

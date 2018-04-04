@@ -16,7 +16,7 @@ from tornado.util import errno_from_exception
 
 
 define('address', default='0.0.0.0', help='listen address')
-define('port', default=8002, help='listen port', type=int)
+define('port', default=8006, help='listen port', type=int)
 define('debug', default=False, help='debug mode', type=bool)
 define('policy', default='warning',
        help='missing host key policy, reject|autoadd|warning')
@@ -134,7 +134,8 @@ class IndexHandler(MixinHandler, tornado.web.RequestHandler):
 
     def set_default_headers(self): ##修改源代码的地方
         self.set_header('Access-Control-Allow-Origin', '*')
-        self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+        # self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+        self.set_header('Access-Control-Allow-Methods', '*')
         self.set_header('Access-Control-Max-Age', 1000)
         self.set_header('Access-Control-Allow-Headers', '*')
         self.set_header('Content-type', 'application/json')
@@ -142,6 +143,8 @@ class IndexHandler(MixinHandler, tornado.web.RequestHandler):
 
     def check_origin(self, origin): ##修改源代码的地方
         return True
+
+
 
 
     # def get_privatekey(self):
@@ -152,42 +155,42 @@ class IndexHandler(MixinHandler, tornado.web.RequestHandler):
     #     return data.decode('utf-8')
 
 
-    # def get_privatekey(self):       ##修改上传KEY 改为 获取 key 路径
-    #     try:
-    #         data1 = '{0}'.format(self.get_argument('privatekey'))
-    #         with open(data1)  as file_object:
-    #             data = file_object.read()
-    #         print(data)
-    #         return data
-    #     except Exception as  e:
-    #         data = None
-    #         return  data
+    def get_privatekey(self):       ##修改上传KEY 改为 获取 key 路径
+        try:
+            data1 = '{0}'.format(self.get_argument('privatekey'))
+            with open(data1)  as file_object:
+                data = file_object.read()
+            print(data)
+            return data
+        except Exception as  e:
+            data = None
+            return  data
 
 
-    # def get_specific_pkey(self, pkeycls, privatekey, password):
-    #     logging.info('Trying {}'.format(pkeycls.__name__))
-    #     try:
-    #         pkey = pkeycls.from_private_key(io.StringIO(privatekey),
-    #                                         password=password)
-    #     except paramiko.PasswordRequiredException:
-    #         raise ValueError('Need password to decrypt the private key.')
-    #     except paramiko.SSHException:
-    #         pass
-    #     else:
-    #         return pkey
-    #
-    # def get_pkey(self, privatekey, password):
-    #     password = password.encode('utf-8') if password else None
-    #
-    #     pkey = self.get_specific_pkey(paramiko.RSAKey, privatekey, password)\
-    #         or self.get_specific_pkey(paramiko.DSSKey, privatekey, password)\
-    #         or self.get_specific_pkey(paramiko.ECDSAKey, privatekey, password)\
-    #         or self.get_specific_pkey(paramiko.Ed25519Key, privatekey,
-    #                                   password)
-    #     if not pkey:
-    #         raise ValueError('Not a valid private key file or '
-    #                          'wrong password for decrypting the private key.')
-    #     return pkey
+    def get_specific_pkey(self, pkeycls, privatekey, password):
+        logging.info('Trying {}'.format(pkeycls.__name__))
+        try:
+            pkey = pkeycls.from_private_key(io.StringIO(privatekey),
+                                            password=password)
+        except paramiko.PasswordRequiredException:
+            raise ValueError('Need password to decrypt the private key.')
+        except paramiko.SSHException:
+            pass
+        else:
+            return pkey
+
+    def get_pkey(self, privatekey, password):
+        password = password.encode('utf-8') if password else None
+
+        pkey = self.get_specific_pkey(paramiko.RSAKey, privatekey, password)\
+            or self.get_specific_pkey(paramiko.DSSKey, privatekey, password)\
+            or self.get_specific_pkey(paramiko.ECDSAKey, privatekey, password)\
+            or self.get_specific_pkey(paramiko.Ed25519Key, privatekey,
+                                      password)
+        if not pkey:
+            raise ValueError('Not a valid private key file or '
+                             'wrong password for decrypting the private key.')
+        return pkey
 
     def get_port(self):
         value = self.get_value('port')
@@ -212,9 +215,9 @@ class IndexHandler(MixinHandler, tornado.web.RequestHandler):
         port = self.get_port()
         username = self.get_value('username')
         password = self.get_argument('password')
-        # privatekey = self.get_privatekey()
-        # pkey = self.get_pkey(privatekey, password) if privatekey else None
-        args = (hostname, port, username, password)
+        privatekey = self.get_privatekey()
+        pkey = self.get_pkey(privatekey, password) if privatekey else None
+        args = (hostname, port, username, password,pkey)
         logging.debug(args)
         return args
 
@@ -268,9 +271,6 @@ class IndexHandler(MixinHandler, tornado.web.RequestHandler):
 
 
 class WsockHandler(MixinHandler, tornado.websocket.WebSocketHandler):
-
-
-
     def __init__(self, *args, **kwargs):
         self.loop = IOLoop.current()
         self.worker_ref = None

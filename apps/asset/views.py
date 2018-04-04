@@ -210,25 +210,27 @@ class AssetWebView(LoginRequiredMixin,View):
     '''
     终端登录
     '''
-    def post(self,request,*args,**kwargs):
-        ret = {'status':True,}
-        try:
-            id = request.POST.get('id',None)
-            print(id)
-            obj = Asset.objects.get(id=id)
-            print(obj)
-            ip = obj.pub_ip
 
+    def post(self, request, *args, **kwargs):
+        ret = {'status': True, }
+        try:
+            id = request.POST.get('id', None)
+            obj = Asset.objects.get(id=id)
+
+            ip = obj.pub_ip
             port = obj.port
             username = obj.system_user.username
             password = obj.system_user.password
-            print(ip,port,username,password)
-            ret.update({"ip":ip,"port":port,"username":username,"password":password})
+            try:
+                privatekey = obj.system_user.private_key.path
+            except Exception as e:
+                privatekey = None
+
+            ret.update({"ip": ip, 'port': port, "username": username, 'password': password, "privatekey": privatekey})
+            # login_ip = request.META['REMOTE_ADDR']
         except Exception as e:
-            traceback.print_exc()
             ret['status'] = False
-            ret['error'] = "请求错误,{}".format(e)
-            print(ret['error'])
+            ret['error'] = '请求错误,{}'.format(e)
         finally:
             return HttpResponse(json.dumps(ret))
 
