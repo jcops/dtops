@@ -1,0 +1,188 @@
+{% extends "_base.html" %}
+{% load staticfiles %}
+{% block  title %}系统用户详情{% endblock %}
+{% block custom_css %}
+
+{% endblock %}
+
+
+{% block  content %}
+
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-lg-10">
+            <h2>系统用户详情</h2>
+            <ol class="breadcrumb">
+                <li>
+                    <a href="{% url 'index' %}">主页</a>
+                </li>
+                <li>
+                    <a href="{%  url 'users:user_list' %}">系统用户管理</a>
+                </li>
+                <li class="active">
+                    <strong>系统用户详情</strong>
+                </li>
+            </ol>
+        </div>
+        <div class="col-lg-2">
+
+        </div>
+    </div>
+
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                            <li class="active">
+                                <a class="text-center"><i class="fa fa-laptop"></i>系统用户详情</a>
+                            </li>
+                            {% if request.user.is_superuser %}
+                            <li class="pull-right">
+                                <a class="btn btn-outline btn-default" href="{% url 'asset:sysuser_update' detail.id %} "><i
+                                        class="fa fa-edit"></i>编辑</a>
+                            </li>
+                            <li class="pull-right">
+                                <a class="btn btn-outline btn-danger  user_del1">
+                                    <i class="fa fa-edit " ></i>删除
+                                </a>
+                            </li>
+                        {% endif %}
+                        </ul>
+
+                    </div>
+                    <div class="tab-content">
+                        <div class="col-sm-7" style="padding-left: 0">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span class="label"><b>用户名:{{ detail.username }}</b></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+
+                                    <table class="table">
+                                        <tbody>
+                                        <tr>
+                                            <td  width="20%">用户ID:</td>
+                                            <td ><b>{{ detail.id }}</b>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td  width="20%">名称:</td>
+                                            <td "><b>{{ detail.name }}</b>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td width="20%">用户:</td>
+                                            <td><b>{{ detail.username }}</b>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td width="20%">密码:</td>
+                                            <td><b>{{ detail.password }}</b></td>
+                                        </tr>
+
+
+                                        <tr>
+                                            <td width="20%">备注:</td>
+                                            <td><b>{{ detail.detail }}</b></td>
+                                        </tr>
+                                           <tr>
+                                            <td width="20%">创建时间:</td>
+                                            <td><b>{{ detail.create_time }}</b></td>
+                                        </tr>
+                                           <tr>
+                                            <td width="20%">更新时间:</td>
+                                            <td><b>{{ detail.update_time }}</b></td>
+                                        </tr>
+
+
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> 快速修改
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table">
+                                        <tbody>
+
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock %}
+
+    {% block footer_js %}
+     <!-- 确定删除弹出框 -->
+   <script>
+            $(function () {
+                $('.user_del1').click(function () {
+                    var nid = $(this).attr('id');
+                        console.log(nid);
+                    swal({
+                        title: "你确定删除",
+                        text: "你将无法恢复",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "确定",
+                        closeOnConfirm: false
+                    }, function () {
+
+                        $.ajax({
+                            headers: {"X-CSRFToken": '{{ csrf_token }}'},
+                            url: "{% url 'asset:del_sysuser'  %}",
+                            type: 'POST',
+                            data: {'nid': {{ detail.id  }} },
+                            success: function (data) {
+
+                                var obj = JSON.parse(data);
+                                if (obj.status) {
+                                    swal({title: "删除", text: "已成功删除",imageUrl: "{% static 'img/thumbs-up.jpg' %}"}, function () {
+                                        location.href = "{% url "asset:system_user" %}"
+                                    })
+
+                                } else {
+                                    swal("错误", "删除" + "[ " + obj.error + " ]" + "遇到错误", "error");
+                                }
+                            }
+                        });
+                    });
+                });
+            });
+        </script>
+    {% endblock %}
+

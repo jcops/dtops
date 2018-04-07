@@ -1,7 +1,8 @@
 from django.conf.urls import url
 
 
-from  .views import AssetListView,SystemUserListAllView,ProductLineListAllView,AddAssetView,DelAssetView,AssetDetailView,AssetUpdateView,auto_update_assets,AssetWebView
+from  .views import AssetListView,SystemUserListAllView,ProductLineListAllView,AddAssetView,DelAssetView,\
+    AssetDetailView,AssetUpdateView,auto_update_assets,AssetWebView,AddSysUserView,Del_SysUserView,SysUserDetailView,SysUserUpdateView
 
 app_name = 'asset'
 urlpatterns = [
@@ -24,4 +25,12 @@ urlpatterns = [
     url(r'auto_update_assets/$', auto_update_assets.as_view(), name='assets_update'),
     # 资产终端
     url(r'assetweb/$', AssetWebView.as_view(), name='asset_web'),
+    # 添加系统用户
+    url(r'sysuser_create/$', AddSysUserView.as_view(), name='sysuser_create'),
+    # 删除系统用户
+    url(r'del_sysuser/$', Del_SysUserView.as_view(), name='del_sysuser'),
+    # 系统用户详情
+    url(r'system_user_detail/(?P<pk>\d+)/$', SysUserDetailView.as_view(), name='system_user_detail'),
+    # 系统用户更新
+    url(r'sysuser_update/(?P<pk>\d+)/$', SysUserUpdateView.as_view(), name='sysuser_update'),
 ]

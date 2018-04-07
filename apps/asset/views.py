@@ -7,10 +7,11 @@ import json
 from  pure_pagination import PageNotAnInteger,Paginator,EmptyPage
 from  dtops import settings
 from  .models import Asset,System_User,ProductLine,Cloud_Platform,Tag
-from .forms import AddAssetModelForm,AssetUpdateModelForm
+from .forms import AddAssetModelForm,AssetUpdateModelForm,SysUserCreateModelForm,SysUserUpdateModelForm
 from utils.Saltapi import SaltAPI
-from utils.retasset import auto_asset
-
+from utils.retasset import auto_asset,MyThread
+import logging
+logger = logging.getLogger('asset')
 salt = SaltAPI(url="https://118.25.39.84:8000", user="saltapi", password="saltapi123")
 # Create your views here.
 
@@ -20,12 +21,21 @@ class AssetListView(LoginRequiredMixin,ListView):
     template_name = 'asset/asset_list.html'
 
     def get_context_data(self, **kwargs):
-        '''分页开始'''
+        '''搜索/分页开始'''
+        self.queryset = super().get_queryset()
+        if self.request.GET.get('name'):
+            query = self.request.GET.get('name', None)
+
+            queryset = Asset.objects.filter(Q(hostname__contains=query) | Q(inner_ip__contains=query) | Q(pub_ip=query))
+            print(queryset)
+        else:
+            queryset = super().get_queryset()
+
         try:
             page = self.request.GET.get('page',1)
         except PageNotAnInteger:
             page = 1
-        p = Paginator(self.queryset,5,request=self.request)
+        p = Paginator(queryset,5,request=self.request)
         asset_list = p.page(page)
         # form_list = AddAssetModelForm
         context = {
@@ -36,27 +46,24 @@ class AssetListView(LoginRequiredMixin,ListView):
             "web_ssh": getattr(settings, 'web_ssh'),
             "web_port": getattr(settings, 'web_port'),
 
+
         }
         kwargs.update(context)
         return super(AssetListView,self).get_context_data(**kwargs)
 
+# 以下搜索方法对开启了分页模式就不会生效
     # def get_queryset(self):
     #     self.queryset = super().get_queryset()
-    #     if self.request.GET.get('search'):
-    #         query = self.request.GET.get('search', None)
+    #     if self.request.GET.get('name'):
+    #         query = self.request.GET.get('name', None)
     #         print(query)
-    #         queryset = self.queryset.filter(Q(hostname=query) | Q(inner_ip=query) | Q(pub_ip=query))
+    #         queryset = Asset.objects.filter(Q(hostname=query) | Q(inner_ip=query) | Q(pub_ip=query))
+    #         print(queryset)
     #     else:
     #         queryset = super().get_queryset()
+    #         print(queryset)
     #     return queryset
-    def get_queryset(self):
-        queryset = super(AssetListView, self).get_queryset()
 
-        q = self.request.GET.get('search','')
-        print(q)
-        if q:
-            return self.queryset.filter(Q(hostname=q) | Q(inner_ip=q) | Q(pub_ip=q))
-        return queryset
 
 class SystemUserListAllView(LoginRequiredMixin,ListView):
     '''系统用户列表'''
@@ -142,8 +149,13 @@ class DelAssetView(LoginRequiredMixin,View):
             nid = request.POST.get("nid", '')
             if nid:
                 Asset.objects.get(id=int(nid)).delete()
-        except Exception:
-            ret = {"status": False, "error": '错误'}
+            else:
+                ids = request.POST.getlist('id',None)
+                print(ids)
+                idstring = ','.join(ids)
+                Asset.objects.extra(where=['id IN ('+ idstring +')']).delete()
+        except Exception as e:
+            ret = {"status": False, "error": '错误{}'.format(e)}
         return HttpResponse(json.dumps(ret))
 
 class AssetDetailView(LoginRequiredMixin,DetailView):
@@ -163,6 +175,7 @@ class AssetDetailView(LoginRequiredMixin,DetailView):
         return super(AssetDetailView,self).get_context_data(**kwargs)
 
 class AssetUpdateView(LoginRequiredMixin,UpdateView):
+    '''资产更新'''
     model = Asset
     form_class = AssetUpdateModelForm
     template_name = 'asset/asset_update.html'
@@ -177,32 +190,60 @@ class AssetUpdateView(LoginRequiredMixin,UpdateView):
         return super(AssetUpdateView,self).get_context_data(**kwargs)
 
 
+
 class auto_update_assets(View):
     def post(self,request):
         ret = {"status": True, "error": False}
         try:
             if self.request.POST.get('all') == 'all':
                 ass =Asset.objects.all()
-                for ii in ass:
-                    asset_info = auto_asset(ii.inner_ip)
-                    asset = Asset.objects.get(inner_ip=ii.inner_ip)
-                    asset.osfinger = asset_info['os']
-                    asset.hostname = asset_info['localhost']
-                    asset.cpu_model = asset_info['cpu_model']
-                    asset.mac_addr = asset_info['hwaddr_interfaces']
-                    asset.mem_total = asset_info['mem_total']
-                    asset.num_cpus = asset_info['num_cpus']
-                    asset.virtual = asset_info['virtual']
-                    asset.serialnumber = asset_info['serialnumber']
-                    asset.dns = asset_info['dns']
-                    asset.kernelrelease = asset_info['kernelrelease']
-                    asset.inner_ip = asset_info['ip4_interfaces']
-                    for de, di in asset_info['disks'].items():
-                        #{'avail': '40.05', 'total': '49.09G', 'capacity': '15%', 'used': '6.54'}
+                ids_list =[ i.inner_ip for i in ass]
+                files = range(len(ids_list))
+                t_list = []
+                t_data = []
+                # for i in files:
+                #     t = MyThread(auto_asset, (ids_list[i],))
+                #     t_list.append(t)
+                #     t.start()
+                # for t in t_list:
+                #     t.join()  # 一定要join，不然主线程比子线程跑的快，会拿不到结果
+                #     t_data.append(t.get_result())
+                # print(t_data)
+                        # asset_info = auto_asset(ii.inner_ip)
+                    # asset = ass.get(inner_ip=ii.inner_ip)
+                for i in files:
+                    t = MyThread(auto_asset, (ids_list[i],))
+                    t_list.append(t)
+                    t.start()
+                for t in t_list:
+                    t.join()  # 一定要join，不然主线程比子线程跑的快，会拿不到结果
+                    t_data.append(t.get_result())
+
+
+
+                for data_dicts in t_data:
+                    asset = Asset.objects.get(inner_ip=data_dicts['ip4_interfaces'])
+                    print(data_dicts)
+                    print(asset.inner_ip)
+                    print(data_dicts['os'])
+                    asset.osfinger = data_dicts['os']
+                    asset.hostname = data_dicts['localhost']
+                    asset.cpu_model = data_dicts['cpu_model']
+                    asset.mac_addr = data_dicts['hwaddr_interfaces']
+                    asset.mem_total =data_dicts['mem_total']
+                    asset.num_cpus =data_dicts['num_cpus']
+                    asset.virtual = data_dicts['virtual']
+                    asset.serialnumber =data_dicts['serialnumber']
+                    asset.dns =data_dicts['dns']
+                    asset.kernelrelease = data_dicts['kernelrelease']
+                    asset.inner_ip = data_dicts['ip4_interfaces']
+                    for de, di in data_dicts['disks'].items():
+                    #{'avail': '40.05', 'total': '49.09G', 'capacity': '15%', 'used': '6.54'}
                         asset.disk_total = ''.join(de + '=' + di['total'])
                     asset.save()
-        except Exception:
-            ret = {"status": False, "error": False}
+        except Exception as e:
+            logger.error(e)
+            ret = {"status": False, "error": '{}'.format(e)}
         return HttpResponse(json.dumps(ret))
 
 import traceback
@@ -234,3 +275,52 @@ class AssetWebView(LoginRequiredMixin,View):
         finally:
             return HttpResponse(json.dumps(ret))
 
+class AddSysUserView(LoginRequiredMixin,CreateView):
+    '''新建系统用户'''
+    model = System_User
+    form_class = SysUserCreateModelForm
+    context_object_name = 'form_list'
+    template_name = 'asset/sysuser_create.html'
+    success_url = reverse_lazy('asset:system_user')
+
+class Del_SysUserView(LoginRequiredMixin,View):
+    '''删除系统用户(ajax)'''
+    def post(self,request):
+        ret = {"status":True,"error":False}
+        try:
+            nid = request.POST.get("nid", '')
+            if nid:
+                System_User.objects.get(id=int(nid)).delete()
+        except Exception:
+            ret = {"status": False, "error": '错误'}
+        return HttpResponse(json.dumps(ret))
+
+class SysUserDetailView(LoginRequiredMixin,DetailView):
+    '''系统用户详情'''
+    model = System_User
+    template_name = 'asset/sysuser_detail.html'
+
+    def get_context_data(self, **kwargs):
+        pk = self.kwargs.get(self.pk_url_kwarg,None)
+        detail = System_User.objects.get(id=pk)
+        print(detail)
+        contenxt = {
+            "detail":detail,
+        }
+        kwargs.update(contenxt)
+        return super(SysUserDetailView,self).get_context_data(**kwargs)
+
+class SysUserUpdateView(LoginRequiredMixin,UpdateView):
+    model = System_User
+    form_class = SysUserCreateModelForm
+    template_name = 'asset/sysuser_update.html'
+    success_url = reverse_lazy('asset:system_user')
+    context_object_name = 'sysuser_update'
+
+    def get_context_data(self, **kwargs):
+        context = {
+            "asset_active": "active",
+            "asset_list_active": "active",
+        }
+        kwargs.update(context)
+        return super(SysUserUpdateView,self).get_context_data(**kwargs)

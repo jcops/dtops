@@ -23,11 +23,11 @@
 
         </div>
     </div>
-
+    <div class="alert alert-info">
+    系统用户指连接服务器的用户,如root,Dtops用该用户来和服务器交互
+    </div>
     <div class="ibox-content">
         <div class="" id="content_start">
-
-
             <div class="html5buttons">
                 <div class="dt-buttons btn-group">
                     <a class="btn btn-default btn_import" data-toggle="modal" data-target="#user_import_modal"
@@ -42,7 +42,7 @@
 
         </div>
 
-        <div class="uc pull-left m-r-5"><a href="{% url 'users:create_user' %}" class="btn btn-sm btn-primary">
+        <div class="uc pull-left m-r-5"><a href="{% url 'asset:sysuser_create' %}" class="btn btn-sm btn-primary">
             新建系统用户 </a></div>
         <div id="user_list_table_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
             <div id="uc" class="pull-left"></div>
@@ -63,7 +63,7 @@
                     <th width="20" class="text-center"><input type="checkbox" id="CheckedAll"></th>
                     <th class="text-center sorting">名称</th>
                     <th class="text-center sorting">用户名</th>
-                    <th class="text-center sorting">密码</th>
+                    <th class="text-center sorting">关联资产</th>
            <th class="text-center sorting">创建用户</th>
                     <th class="text-center sorting">备注</th>
 
@@ -82,9 +82,9 @@
                         {#         <input type="checkbox" class="text-center ipt_check" id="{{ user_list.id }}">#}
                         {#        </td>#}
                         <td class=" text-center"><input type="checkbox" value="{{ system_user_list.id }}" name="id"></td>
-                        <td class=" text-center"><a href="">{{ system_user_list.name }}</a></td>
+                        <td class=" text-center"><a href="{% url 'asset:system_user_detail'  system_user_list.id  %}">{{ system_user_list.name }}</a></td>
                         <td class=" text-center">{{ system_user_list.username }}</td>
-                        <td class=" text-center">{{ system_user_list.password }}</td>
+                        <td class=" text-center">{{ system_user_list.asset_set.all.count }}</td>
 
                               <td class=" text-center">{{ system_user_list.create_user }}</td>
                               <td class=" text-center">{{ system_user_list.detail }}</td>
@@ -93,7 +93,7 @@
 
 
                         <td class=" text-center">
-                            <a href="" class="btn btn-xs btn-info">详情</a>
+                            <a href="{%  url 'asset:system_user_detail' system_user_list.id  %}" class="btn btn-xs btn-info">详情</a>
                             <button class="btn btn-xs btn-danger m-l-xs user_del1 del2" id="{{ system_user_list.id }}">删除</button>
 
                             {#              <button class="btn btn-xs btn-danger m-l-xs system_user_del" id="{{ user_list.id }}">删除</button>#}
@@ -114,6 +114,44 @@
 
     <script src="{% static 'js/plugins/dataTables/datatables.min.js' %}"></script>
     <script src="{% static 'js/plugins/iCheck/icheck.min.js' %}"></script>
+      <!-- 确定删除弹出框 -->
+   <script>
+            $(function () {
+                $('.user_del1').click(function () {
+                    var nid = $(this).attr('id');
+                        console.log(nid);
+                    swal({
+                        title: "你确定删除",
+                        text: "你将无法恢复",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "确定",
+                        closeOnConfirm: false
+                    }, function () {
+
+                        $.ajax({
+                            headers: {"X-CSRFToken": '{{ csrf_token }}'},
+                            url: "{% url 'asset:del_sysuser'  %}",
+                            type: 'POST',
+                            data: {'nid': nid },
+                            success: function (data) {
+
+                                var obj = JSON.parse(data);
+                                if (obj.status) {
+                                    swal({title: "删除", text: "已成功删除",imageUrl: "{% static 'img/thumbs-up.jpg' %}"}, function () {
+                                        location.href = "{% url "asset:system_user" %}"
+                                    })
+
+                                } else {
+                                    swal("错误", "删除" + "[ " + obj.error + " ]" + "遇到错误", "error");
+                                }
+                            }
+                        });
+                    });
+                });
+            });
+        </script>
 {#    <script>#}
 {#        $(document).ready(function () {#}
 {#            $('.i-checks').iCheck({#}

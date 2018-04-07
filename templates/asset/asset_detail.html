@@ -125,6 +125,10 @@
                                             <td width="20%">MAC地址:</td>
                                             <td><b>{{ detail_list.mac_addr }}</b></td>
                                         </tr>
+                                                   <tr>
+                                            <td width="20%">DNS地址:</td>
+                                            <td><b>{{ detail_list.dns }}</b></td>
+                                        </tr>
                                                <tr>
                                             <td width="20%">内核版本:</td>
                                             <td><b>{{ detail_list.kernelrelease }}</b></td>
@@ -147,15 +151,20 @@
                                         </tr>
                                                    <tr>
                                             <td width="20%">云平台:</td>
-                                            <td><b>{{ detail_list.cloud_platform }}</b></td>
+                                            <td><b>{{ detail_list.cloud_platform.cloud }}</b></td>
                                         </tr>
                                                       <tr>
                                             <td width="20%">系统用户:</td>
                                             <td><b>{{ detail_list.system_user }}</b></td>
                                         </tr>
-                                                        <tr>
+                                        <tr>
                                             <td width="20%">标签:</td>
-                                            <td><b>{{ detail_list.tag.name }}</b></td>
+                                            {% for tag in asset.tag.all %}
+{#                                            <td><b>{{ tag.name }}</b></td>#}
+                                               <td class="label label-primary ">{{ tag.name }}</td>
+                                            {% empty %}
+                                            {% endfor %}
+
                                         </tr>
                                                          <tr>
                                             <td width="20%">备注:</td>

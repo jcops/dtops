@@ -3,6 +3,10 @@
 #Author:Eric
 
 import os,django
+import threading
+from time import sleep, ctime
+
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dtops.settings")# project_name 项目名称
 django.setup()
 from utils.Saltapi import SaltAPI
@@ -29,7 +33,6 @@ def disks(tgt,fun):
                 disk[fs] = { 'total': total, 'avail': avail,'used':used,'capacity':capacity}
             else:
                 continue
-        print(disk)
 
         return disk
 
@@ -37,11 +40,12 @@ def disks(tgt,fun):
 
 def auto_asset(node):
     ret = salt.remote_grains_execution_sigle(node)
-    asset_info = {}
+    # asset_info = {'ls':'pwd','os':'oooo','dns':'1.1.1.1'}
+    asset_info={}
     asset_info['os']= ret[node]['oscodename']
     asset_info['kernelrelease']= ret[node]['kernelrelease']
     asset_info['cpu_model']= ret[node]['cpu_model']
-    asset_info['dns']= ''.join(ret[node]['dns']['ip4_nameservers'])
+    asset_info['dns']= ','.join(ret[node]['dns']['ip4_nameservers'])
     asset_info['serialnumber'] =  ret[node]['serialnumber']
     asset_info['virtual'] =  ret[node]['virtual']
     asset_info['localhost'] = ret[node]['localhost']
@@ -52,7 +56,7 @@ def auto_asset(node):
     asset_info['disks'] = disks(node,'disk.usage')
 
     # selinux = ret[node]['enabled']
-    return  asset_info
+    return asset_info
 # ass = Asset.objects.all()
 # for ii in ass:
 #     asset_info=auto_asset(ii.inner_ip)
@@ -73,4 +77,52 @@ def auto_asset(node):
 #         asset.disk_total = ''.join(de + di['total'])
 #     asset.save()
 
+class MyThread(threading.Thread):
+    def __init__(self, func,args):
+        super(MyThread, self).__init__()
+        self.func = func
+        self.args =args
 
+
+    def run(self):
+        self.result = self.func(*self.args)
+        # 相当于执行auto_asset(node)
+    def get_result(self):
+        try:
+            return self.result  # 如果子线程不使用join方法，此处可能会报没有self.result的错误
+        except Exception:
+            return None
+
+def getss():
+    obj = Asset.objects.all()
+    b = []
+    for i in obj:
+        b.append(i.inner_ip)
+
+    files = range(len(b))
+    t_list = []
+    for i in files:
+        t = MyThread(auto_asset,(b[i],))
+        t_list.append(t)
+        t.start()
+    for t in t_list:
+        t.join()  # 一定要join，不然主线程比子线程跑的快，会拿不到结果
+        aa = t.get_result()
+    return t_list
+bb = getss()
+
+
+#     #启动线程
+#     for i in files:
+#         t_list[i].start()
+#         tt = t_list[i].join()
+#         print(tt)
+#
+#     for i in files:
+#         t_list[i].join()
+
+#     #主线程
+#         print ( 'end:%s' %ctime())
+# for iii in t_list:
+#     iii.join()
+#     print(iii['os'])

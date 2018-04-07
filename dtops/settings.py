@@ -92,7 +92,7 @@ DATABASES = {
         'USER': 'root',
         'PASSWORD': 'Niejc123#',
         'PORT': '3306',
-        'HOST': '',
+        'HOST': '118.25.39.84',
     }
 }
 
@@ -152,7 +152,7 @@ PAGINATION_SETTINGS = {
 web_ssh = "127.0.0.1"
 web_port = 8006
 
-import sys
+import sys,datetime
 
 LOGGING = {
     'version': 1,
@@ -171,7 +171,7 @@ LOGGING = {
         },
     },
     'loggers': {
-        'tasks': {
+        'users': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': True,
@@ -181,5 +181,25 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
+        'handlers': {
+            'file': {
+                'level': 'DEBUG',
+                'class': 'logging.handlers.RotatingFileHandler',
+                'filename': 'logs/asset_%s.log' % (datetime.datetime.now().strftime('%Y-%m-%d_%H')),
+            # 日志文件以每小时为单位
+                'formatter': 'standard',
+            },
+            'default': {
+                'level': 'ERROR',
+                'class': 'logging.FileHandler',
+                'filename': 'logs/django.log',
+                'formatter': 'standard',
+            }
+        },
+        # 'asset': {
+        #     'handlers': ['file'],
+        #     'level': 'DEBUG',
+        #     'propagate': True,
+        # },
     },
 }

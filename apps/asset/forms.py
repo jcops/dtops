@@ -1,8 +1,8 @@
 from django import forms
 
-from  .models import Asset
+from  .models import Asset,System_User
 class AddAssetModelForm(forms.ModelForm):
-
+    '''资产添加表单'''
     class Meta:
         model = Asset
         # fields = ['hostname','inner_ip','pub_ip']
@@ -27,6 +27,7 @@ class AddAssetModelForm(forms.ModelForm):
 
 
         }
+
         widgets = {
             'inner_ip':forms.TextInput(
                 attrs={'class':'form-control','placeholder':'请输入内网IP','cols': 80, 'rows': 20}),
@@ -61,7 +62,7 @@ class AddAssetModelForm(forms.ModelForm):
         }
 
 class AssetUpdateModelForm(forms.ModelForm):
-
+    '''资产更新表单'''
     class Meta:
         model = Asset
         exclude = ['create_time','update_time']
@@ -82,7 +83,7 @@ class AssetUpdateModelForm(forms.ModelForm):
         'system_user': forms.Select(
             attrs={'class': 'select2', 'data-placeholder': '-------请选择系统用户---------', }),
         'disk_total': forms.TextInput(
-            attrs={'class': 'form-control', 'placeholder': '请输入磁盘大小', 'cols': 80, 'rows': 20}),
+            attrs={'class': 'form-control', 'placeholder': '请输入磁盘大小', 'cols': 80, 'rows': 20,}),
         'num_cpus': forms.TextInput(
             attrs={'class': 'form-control', 'placeholder': '请输入CPU核数', 'cols': 80, 'rows': 20}),
         'osfinger': forms.TextInput(
@@ -94,5 +95,45 @@ class AssetUpdateModelForm(forms.ModelForm):
         'cloud_platform': forms.Select(
             attrs={'class': 'select2', 'data-placeholder': '-------请选择云平台---------'}),  ##select是bootstrap的高级功能
         'tag': forms.SelectMultiple(
-            attrs={'class': 'select2', }),
+            attrs={'class': 'select2', 'data-placeholder':'标签',}),
+
+
     }
+
+class SysUserCreateModelForm(forms.ModelForm):
+    '''添加系统用户'''
+    class Meta:
+        model = System_User
+        exclude = ['create_time','update_time']
+        widgets = {
+            'name':forms.TextInput(
+                attrs={'class':'form-control','placeholder':'名称'}
+            ),
+            'username': forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': '用户'}
+            ),
+            'password': forms.PasswordInput(
+                attrs={'class': 'form-control',}
+            ),
+            'detail': forms.Textarea(
+                attrs={'class': 'form-control', 'placeholder': '备注信息', 'cols': 20, 'rows': 3}),
+        }
+
+class SysUserUpdateModelForm(forms.ModelForm):
+    class Meta:
+        model = System_User
+        exclude = ['create_time','update_time']
+
+        widgets = {
+            'name': forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': '名称'}
+            ),
+            'username': forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': '用户'}
+            ),
+            'password': forms.PasswordInput(
+                attrs={'class': 'form-control', 'placeholder': '密码'}
+            ),
+            'detail': forms.Textarea(
+                attrs={'class': 'form-control', 'placeholder': '备注信息', 'cols': 20, 'rows': 3}),
+        }

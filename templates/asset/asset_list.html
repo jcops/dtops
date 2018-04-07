@@ -38,6 +38,9 @@
         .dropdown a:hover {
             background-color: #f1f1f1
         }
+        .bgRed{
+    background-color: #b2dba1;
+}
     </style>
 {% endblock %}
 
@@ -62,9 +65,13 @@
 
         </div>
     </div>
-
+    <div class="alert alert-info">
+    下面为全部资产信息列表,可进行增删改查/远程连接/更新资产信息等操作
+    </div>
     <div class="ibox-content">
+
         <div class="" id="content_start">
+
             <div class="html5buttons">
 
                 <div class="dt-buttons btn-group">
@@ -80,12 +87,15 @@
 
         </div>
 
-        <div class="uc pull-left m-r-5">
-            <a href="{% url 'asset:asset_add' %}" class="btn btn-sm btn-primary">新建资产 </a>
-        </div>
+
+
+
+
 
             <div class="uc pull-left m-r-4">
-                 <button class="btn btn-sm btn-primary assets_update" >刷新资产</button>
+                <a href="{% url 'asset:asset_add' %}" class="btn btn-sm btn-primary">新建资产 </a>
+                 <a class="btn btn-sm btn-primary assets_update"> 更新资产</a>
+                <a class="btn btn-sm btn-danger asset_del_all"> 批量删除</a>
 
         </div>
 {#        <a class="btn btn-sm btn-default btn-add" data-toggle="modal" data-target="#AddHostModal" data-backdrop='static'>#}
@@ -95,17 +105,18 @@
 {#                    <i class="fa fa-plus"></i> 添加主机#}
 {#                </a>#}
         <div id="user_list_table_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
-            <div id="uc" class="pull-left">
-
-            </div>
-            <form  method="GET" action="{% url 'asset:asset_list' %}" class="form-horizontal">
+            <div id="uc" class="pull-left"></div>
+               <form id="cha" method="GET" action="{% url 'asset:asset_list' %}" class="form-horizontal">
+{#            {% csrf_token %}#}
             <div id="asset_list_table_filter" class="dataTables_filter">
                 <label>搜索</label>
-                    <input type="search" class="form-control input-sm" name="search" placeholder="请输入..." aria-controls="asset_list_table">
+                    <input type="search" class="form-control input-sm" name="name" placeholder="请输入..." aria-controls="asset_list_table">
 
             </div>
             </form>
 
+        <form method="post" action="" class="form-horizontal" id="del_form_all">
+            {% csrf_token %}
             <table class="table table-striped table-bordered table-hover  dataTable no-footer dataTables-asset">
                 <thead>
                 <tr role="row">
@@ -175,6 +186,8 @@
 {#      <div id="status" style="color: red;"></div>#}
 {#      <div id="terminal"></div>#}
 {#    </div>#}
+
+
          <div>
              <ul class="pagination pull-right">
                                         {% if asset_list.has_previous %}
@@ -199,7 +212,10 @@
                                                     href="?{{ asset_list.next_page_number.querystring }}">下一页</a></li>
                                         {% endif %}
                                     </ul>
-</div>
+
+                </div>
+
+          </form>
          </div>
 
     </div>
@@ -256,9 +272,48 @@
             });
         </script>
 
+   <!-- 批量删除弹出框 -->
+   <script>
+{#            $(function () {#}
+{#                $('.asset_del_all').click(function () {#}
+              $(document).on('click', '.asset_del_all', function () {
+                    swal({
+                        title: "你确定删除",
+                        text: "你将无法恢复",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "确定",
+                        closeOnConfirm: false
+                    }, function () {
 
+                        $.ajax({
+                            headers: {"X-CSRFToken": '{{ csrf_token }}'},
+                            url: "{% url 'asset:del_asset'  %}",
+                            type: 'POST',
+{#                            序列化id#}
+                            data:$('#del_form_all').serialize(),
+                            success: function (data) {
+                                var obj = JSON.parse(data);
+                                if (obj.status) {
+                                    toastr.success('删除成功');
+                                    swal({title: "删除", text: "已成功删除",imageUrl: "{% static 'img/thumbs-up.jpg' %}"}, function () {
+                                        location.href = "{% url "asset:asset_list" %}"
+                                    })
+
+                                } else {
+                                    toastr.error("错误", "删除" + "[ " + obj.error + " ]" + "遇到错误");
+{#                                    swal("错误", "删除" + "[ " + obj.error + " ]" + "遇到错误", "error");#}
+                                }
+                            }
+                        });
+                    });
+                });
+
+        </script>
 
      <script>
+{#     资产信息刷新#}
             $(function () {
                 $('.assets_update').click(function () {
 {#                    var nid = $(this).attr('id');#}
@@ -274,6 +329,7 @@
                     }, function () {
 
                         $.ajax({
+                            headers: {"X-CSRFToken": '{{ csrf_token }}'},
                             url: "{% url 'asset:assets_update'  %}",
                             type: 'POST',
                             data: {'all': 'all' },
@@ -281,12 +337,22 @@
 
                                 var obj = JSON.parse(data);
                                 if (obj.status) {
-                                    swal({title: "更新", text: "已更新资产信息",imageUrl: "{% static 'img/thumbs-up.jpg' %}"}, function () {
-                                        location.href = "{% url "asset:asset_list" %}"
-                                    })
+
+{#                                        location.href = "{% url "asset:asset_list" %}";#}
+                                    location.reload()
+                                         toastr.success('更新资产信息成功');
+{#                                    swal({title: "更新", text: "已更新资产信息",imageUrl: "{% static 'img/thumbs-up.jpg' %}"}, function () {#}
+{#                                        toastr.success('更新资产信息成功');#}
+{#                                        location.href = "{% url "asset:asset_list" %}";#}
+{#                                         success_message: "更新硬件信息任务下发成功",#}
+{#                                          uccess: success#}
+{#                                        #}
+{#                                    });#}
 
                                 } else {
+                                     toastr.error('更新资产信息出现未知错误');
                                     swal("错误", "更新" + "[ " + obj.error + " ]" + "遇到错误", "error");
+
                                 }
                             }
                         });
@@ -296,6 +362,7 @@
 
         </script>
     <script>
+{#    <!--终端连接 -->#}
            jQuery(function ($) {
                 $(document).on('click', '.webssh', function (event) {
 
@@ -396,6 +463,8 @@
                     });
                 });
             });
+
+
     </script>
 {# <!-- 添加记录提交 -->#}
 {#  <script>#}

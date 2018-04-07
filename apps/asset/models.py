@@ -13,8 +13,8 @@ class Asset(models.Model):
         ('上线','上线'),
     )
 
-    hostname = models.CharField(max_length=30,  verbose_name='主机名')
-    inner_ip = models.GenericIPAddressField(max_length=20,unique=True ,verbose_name='内网管理IP')
+    hostname = models.CharField(max_length=30, unique=True, verbose_name='主机名')
+    inner_ip = models.GenericIPAddressField(max_length=20 ,unique=True,verbose_name='内网管理IP')
     pub_ip = models.GenericIPAddressField(max_length=20, null=True, blank=True, verbose_name='公网IP', unique=True)
     port = models.IntegerField(default=22, verbose_name='端口')
     mem_total = models.CharField(max_length=64, null=True, blank=True, verbose_name='总内存')
@@ -23,10 +23,10 @@ class Asset(models.Model):
     num_cpus = models.IntegerField(null=True,blank=True,verbose_name='CPU核数')
     osfinger = models.CharField(max_length=64,null=True,blank=True,verbose_name='系统版本')
     osrelease = models.CharField(max_length=64,null=True,blank=True,verbose_name='系统发行版本')
-    dns = models.GenericIPAddressField(max_length=64,null=True,blank=True,verbose_name='DNS')
+    dns = models.CharField(max_length=64,null=True,blank=True,verbose_name='DNS')
     mac_addr = models.CharField(max_length=64,null=True,blank=True,verbose_name='MAC地址')
     kernelrelease = models.CharField(max_length=64,null=True,blank=True,verbose_name='内核版本')
-    serialnumber = models.CharField(max_length=64,null=True,blank=True,verbose_name='序列号',unique=True)
+    serialnumber = models.CharField(max_length=64,null=True,blank=True,unique=True,verbose_name='序列号')
     virtual = models.CharField(max_length=20,null=True,blank=True,verbose_name='虚拟化')
     status = models.CharField(max_length=5,choices=STATUS_CHOICES,default='正常',verbose_name='状态')
     detail = models.CharField(max_length=100,null=True,blank=True,verbose_name='备注')
@@ -69,7 +69,7 @@ class System_User(models.Model):
 class ProductLine(models.Model):
     '''产品线'''
 
-    name = models.CharField(max_length=20, unique=True, verbose_name='产品线名称')
+    name = models.CharField(max_length=50, unique=True, verbose_name='产品线名称')
     detail = models.CharField(max_length=100, null=True, blank=True, verbose_name='备注')
 
     create_time = models.DateTimeField(auto_now_add=True,null=True, blank=True, verbose_name='创建时间')
@@ -84,7 +84,7 @@ class ProductLine(models.Model):
 
 class Tag(models.Model):
     '''标签'''
-    name = models.CharField(max_length=20, unique=True, verbose_name='标签')
+    name = models.CharField(max_length=50, unique=True, verbose_name='标签')
 
     create_time = models.DateTimeField(auto_now_add=True,null=True, blank=True, verbose_name='创建时间')
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True,verbose_name='更新时间')
@@ -104,8 +104,8 @@ class Cloud_Platform(models.Model):
         ('其他', '其他'),
         ('私有云', '私有云'),
     )
-    name = models.CharField(max_length=20, unique=True, verbose_name='名称')
-    cloud = models.CharField(max_length=20,choices=CLOUD_CHOICES,null=True,blank=True, verbose_name='云平台')
+    name = models.CharField(max_length=30, unique=True, verbose_name='名称')
+    cloud = models.CharField(max_length=50,choices=CLOUD_CHOICES,null=True,blank=True, verbose_name='云平台')
     detail = models.CharField(max_length=100, null=True, blank=True, verbose_name='备注')
 
     create_time = models.DateTimeField(auto_now_add=True,null=True, blank=True, verbose_name='创建时间')
