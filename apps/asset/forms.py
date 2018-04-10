@@ -137,3 +137,7 @@ class SysUserUpdateModelForm(forms.ModelForm):
             'detail': forms.Textarea(
                 attrs={'class': 'form-control', 'placeholder': '备注信息', 'cols': 20, 'rows': 3}),
         }
+
+
+class FileFrom(forms.Form):
+    file = forms.FileField()

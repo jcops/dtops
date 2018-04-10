@@ -2,7 +2,7 @@ from django.conf.urls import url
 
 
 from  .views import AssetListView,SystemUserListAllView,ProductLineListAllView,AddAssetView,DelAssetView,\
-    AssetDetailView,AssetUpdateView,auto_update_assets,AssetWebView,AddSysUserView,Del_SysUserView,SysUserDetailView,SysUserUpdateView
+    AssetDetailView,AssetUpdateView,auto_update_assets,AssetWebView,AddSysUserView,Del_SysUserView,SysUserDetailView,SysUserUpdateView,ExAssetView,ImAssetView
 
 app_name = 'asset'
 urlpatterns = [
@@ -33,4 +33,8 @@ urlpatterns = [
     url(r'system_user_detail/(?P<pk>\d+)/$', SysUserDetailView.as_view(), name='system_user_detail'),
     # 系统用户更新
     url(r'sysuser_update/(?P<pk>\d+)/$', SysUserUpdateView.as_view(), name='sysuser_update'),
+    # 资产导出
+    url(r'ex_asset/$', ExAssetView.as_view(), name='ex_asset'),
+    # 资产导入
+    url(r'im_asset/$', ImAssetView.as_view(), name='im_asset'),
 ]

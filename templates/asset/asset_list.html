@@ -77,11 +77,20 @@
                 <div class="dt-buttons btn-group">
                     <a class="btn btn-default btn_import" data-toggle="modal" data-target="#user_import_modal"
                        tabindex="0">
-                        <span>导入</span>
+                        <span><a href="{% url 'asset:ex_asset' %}" class="btn btn-primary btn-sm" type="button">导出</a></span>
                     </a>
-                    <a class="btn btn-default btn_export" tabindex="0">
-                        <span>导出</span>
-                    </a>
+                    <form method="post" action="{% url 'asset:im_asset' %}" class="form" enctype="multipart/form-data">
+                                 {% csrf_token %}
+
+{#                         <input type="file"><a class="btn btn-default btn_export" tabindex="0"><span>导入</span></a>#}
+{#                            <label><i class="icon-file"></i> 请选择需要被导入的文件</label>#}
+             <input id="file" type="file" name="file"/>
+{#                       {{ files }}#}
+                 <input type="submit" id="btn_sjdr" value="导入" class="btn btn-primary btn-sm"/>
+
+
+                    </form>
+
                 </div>
             </div>
 
@@ -464,6 +473,18 @@
                 });
             });
 
+
+           $('#btn_sjdr').click(function(){
+   $.post("{% url 'asset:im_asset' %}",
+     {
+       csrfmiddlewaretoken:"{{ csrf_token }}",
+      file:$("#file").val(),
+     },
+     function(data) {
+      alert('成功')
+     }
+   )
+  });
 
     </script>
 {# <!-- 添加记录提交 -->#}

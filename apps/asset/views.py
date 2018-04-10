@@ -4,12 +4,14 @@ from django.views.generic import ListView,TemplateView,UpdateView,DetailView,Del
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 import json
+import  xlwt,time
 from  pure_pagination import PageNotAnInteger,Paginator,EmptyPage
 from  dtops import settings
 from  .models import Asset,System_User,ProductLine,Cloud_Platform,Tag
-from .forms import AddAssetModelForm,AssetUpdateModelForm,SysUserCreateModelForm,SysUserUpdateModelForm
+from .forms import AddAssetModelForm,AssetUpdateModelForm,SysUserCreateModelForm,SysUserUpdateModelForm,FileFrom
 from utils.Saltapi import SaltAPI
 from utils.retasset import auto_asset,MyThread
+from utils.Export_assets import write_excel
 import logging
 logger = logging.getLogger('asset')
 salt = SaltAPI(url="https://118.25.39.84:8000", user="saltapi", password="saltapi123")
@@ -38,11 +40,13 @@ class AssetListView(LoginRequiredMixin,ListView):
         p = Paginator(queryset,5,request=self.request)
         asset_list = p.page(page)
         # form_list = AddAssetModelForm
+        files = FileFrom()
         context = {
             "asset_active":"active",
             "asset_list_active": "active",
             "asset_list":asset_list,
             # "form_list":form_list,
+            "files":files,
             "web_ssh": getattr(settings, 'web_ssh'),
             "web_port": getattr(settings, 'web_port'),
 
@@ -324,3 +328,167 @@ class SysUserUpdateView(LoginRequiredMixin,UpdateView):
         }
         kwargs.update(context)
         return super(SysUserUpdateView,self).get_context_data(**kwargs)
+
+class ExAssetView(LoginRequiredMixin,View):
+    def get(self,request):
+        row = 1
+        style_heading = xlwt.easyxf("""
+                font:
+                    name Arial,
+                    colour_index white,
+                    bold on,
+                    height 0xA0;
+                align:
+                    wrap off,
+                    vert center,
+                    horiz center;
+                pattern:
+                    pattern solid,
+                    fore-colour ocean_blue;
+                borders:
+                    left THIN,
+                    right THIN,
+                    top THIN,
+                    bottom THIN;
+                """)
+        style_body = xlwt.easyxf("""
+                font:
+                    name Arial,
+                    bold off,
+                    height 0XA0;
+                align:
+                    wrap on,
+                    vert center,
+                    horiz left;
+                borders:
+                    left THIN,
+                    right THIN,
+                    top THIN,
+                    bottom THIN;
+                """)
+        fmts = [
+            'M/D/YY',
+            'D-MMM-YY',
+            'D-MMM',
+            'MMM-YY',
+            'h:mm AM/PM',
+            'h:mm:ss AM/PM',
+            'h:mm',
+            'h:mm:ss',
+            'M/D/YY h:mm',
+            'mm:ss',
+            '[h]:mm:ss',
+            'mm:ss.0',
+        ]
+
+        style_green = xlwt.easyxf(" pattern: pattern solid,fore-colour 0x11;")
+        style_red = xlwt.easyxf(" pattern: pattern solid,fore-colour 0x0A;")
+        style_body.num_format_str = fmts[0]
+        ass_all = Asset.objects.all()
+        response = HttpResponse(content_type='application/vnd.ms-excel')#这里响应对象获得了一个特殊的mime类型,告诉浏览器这是个exell文件不是html
+        response['Content-Disposition'] = 'attachment; filename=asset'+time.strftime('%Y%m%d',time.localtime(time.time()))+'.xls'#这里响应对象获得了附加的Content-Disposition协议头,它含有excel文件的名称,文件名随意,当浏览器访问它时,会以"另存为"对话框中使用它
+        f = xlwt.Workbook()  # 创建工作簿
+        sheet1 = f.add_sheet(u'sheet1', cell_overwrite_ok=True)  # 创建sheet
+        # sheet1.write(0, 1, label='内网ip', style_heading)
+        sheet1.write(0, 0, '主机名', style_heading)
+        sheet1.write(0, 1, '内网ip', style_heading)
+        sheet1.write(0, 2, '外网ip', style_heading)
+        sheet1.write(0, 3, '端口', style_heading)
+        sheet1.write(0, 4, '总内存', style_heading)
+        sheet1.write(0, 5, '总磁盘', style_heading)
+        sheet1.write(0, 6, 'CPU型号', style_heading)
+        sheet1.write(0, 7, 'CPU核数', style_heading)
+        sheet1.write(0, 8, '系统版本', style_heading)
+        sheet1.write(0, 9, '系统发行版本', style_heading)
+        sheet1.write(0, 10, 'DNS', style_heading)
+        sheet1.write(0, 11, 'MAC地址', style_heading)
+        sheet1.write(0, 12, '内核版本', style_heading)
+        sheet1.write(0, 13, '序列号', style_heading)
+        sheet1.write(0, 14, '虚拟化', style_heading)
+        sheet1.write(0, 15, '状态', style_heading)
+        sheet1.write(0, 16, '系统用户', style_heading)
+        sheet1.write(0, 17, '产品线', style_heading)
+        sheet1.write(0, 18, '标签', style_heading)
+        sheet1.write(0, 19, '云平台', style_heading)
+        sheet1.write(0, 20, '创建用户', style_heading)
+        sheet1.write(0, 21, '备注', style_heading)
+        sheet1.write(0, 22, '创建时间', style_heading)
+        sheet1.write(0, 23, '更新时间', style_heading)
+        for ass in ass_all:
+            sheet1.write(row, 0, ass.hostname)
+            sheet1.write(row, 1, ass.inner_ip)
+            sheet1.write(row, 2, ass.pub_ip)
+            sheet1.write(row, 3, ass.port)
+            sheet1.write(row, 4, ass.mem_total)
+            sheet1.write(row, 5, ass.disk_total)
+            sheet1.write(row, 6, ass.cpu_model)
+            sheet1.write(row, 7, ass.num_cpus)
+            sheet1.write(row, 8, ass.osfinger)
+            sheet1.write(row, 9, ass.osrelease)
+            sheet1.write(row, 10, ass.dns)
+            sheet1.write(row, 11, ass.mac_addr)
+            sheet1.write(row, 12, ass.kernelrelease)
+            sheet1.write(row, 13, ass.serialnumber)
+            sheet1.write(row, 14, ass.virtual)
+            if ass.status == '正常':
+
+                sheet1.write(row, 15, ass.status,style_green)
+            else:
+                sheet1.write(row, 15, ass.status, style_red)
+
+            sheet1.write(row, 16, ass.system_user.name + '--' + ass.system_user.username)
+            sheet1.write(row, 17, ass.product.name)
+            for tags in ass.tag.all():
+                sheet1.write(row, 18, tags.name)
+            sheet1.write(row, 19, ass.cloud_platform.cloud)
+            sheet1.write(row, 20, ass.create_user)
+            sheet1.write(row, 21, ass.detail)
+            sheet1.write(row, 22, str(ass.create_time), style_body)
+            sheet1.write(row, 23, str(ass.update_time), style_body)
+
+            row += 1
+        f.save(response)#写入表格
+        return response
+import  xlrd
+class ImAssetView(LoginRequiredMixin,View):
+    def post(self, request):
+        form = FileFrom(request.POST, request.FILES)
+        # file_sjdr = request.POST.get('file_keywork')
+        print(form)
+        if form.is_valid():
+            print(request.FILES['file'])
+            files = request.FILES['file']
+            with open('asset.xls', mode='wb') as f:
+                for chunk in files.chunks():
+                    f.write(chunk)
+
+            data = xlrd.open_workbook('asset.xls')
+            # 获取工作表sheet1
+            table = data.sheet_by_name('sheet1')
+            # 获取行数和列数
+            nrows, ncols = table.nrows, table.ncols
+            #
+            colnames = table.row_values(0)
+            w = []
+            for i in range(1, nrows):
+                # 获取每行的值
+                row = table.row_values(i)
+                print()
+                for j in range(0, ncols):  #
+                    if type(row[j]) == float:
+                        row[j] = int(row[j])
+                if row:
+                    if Asset.objects.filter(hostname=row[0], inner_ip=row[1], pub_ip=row[2]).exists():
+                        pass
+                    else:
+                        w.append(Asset(hostname=row[0], inner_ip=row[1], pub_ip=row[2], port=row[3], mem_total=row[4],
+                                       disk_total=row[5], cpu_model=row[6], num_cpus=row[7], osfinger=row[8],
+                                       osrelease=row[9],
+                                       dns=row[10], mac_addr=row[11], kernelrelease=row[12], serialnumber=row[13],
+                                       virtual=row[14], status=row[15], detail=row[16]))
+
+            Asset.objects.bulk_create(w)
+            da = {"status": True, "success": '导入成功'}
+            import  os
+            os.remove('asset.xls')
+            return  HttpResponseRedirect(reverse('asset:asset_list'))
