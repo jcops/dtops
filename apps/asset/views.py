@@ -4,7 +4,7 @@ from django.views.generic import ListView,TemplateView,UpdateView,DetailView,Del
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 import json
-import  xlwt,time
+import  xlwt,time,xlrd
 from  pure_pagination import PageNotAnInteger,Paginator,EmptyPage
 from  dtops import settings
 from  .models import Asset,System_User,ProductLine,Cloud_Platform,Tag
@@ -12,6 +12,8 @@ from .forms import AddAssetModelForm,AssetUpdateModelForm,SysUserCreateModelForm
 from utils.Saltapi import SaltAPI
 from utils.retasset import auto_asset,MyThread
 from utils.Export_assets import write_excel
+#打印栈信息
+import traceback
 import logging
 logger = logging.getLogger('asset')
 salt = SaltAPI(url="https://118.25.39.84:8000", user="saltapi", password="saltapi123")
@@ -196,6 +198,7 @@ class AssetUpdateView(LoginRequiredMixin,UpdateView):
 
 
 class auto_update_assets(View):
+    '''更新资产信息'''
     def post(self,request):
         ret = {"status": True, "error": False}
         try:
@@ -227,9 +230,6 @@ class auto_update_assets(View):
 
                 for data_dicts in t_data:
                     asset = Asset.objects.get(inner_ip=data_dicts['ip4_interfaces'])
-                    print(data_dicts)
-                    print(asset.inner_ip)
-                    print(data_dicts['os'])
                     asset.osfinger = data_dicts['os']
                     asset.hostname = data_dicts['localhost']
                     asset.cpu_model = data_dicts['cpu_model']
@@ -250,7 +250,7 @@ class auto_update_assets(View):
             ret = {"status": False, "error": '{}'.format(e)}
         return HttpResponse(json.dumps(ret))
 
-import traceback
+
 class AssetWebView(LoginRequiredMixin,View):
     '''
     终端登录
@@ -315,6 +315,7 @@ class SysUserDetailView(LoginRequiredMixin,DetailView):
         return super(SysUserDetailView,self).get_context_data(**kwargs)
 
 class SysUserUpdateView(LoginRequiredMixin,UpdateView):
+    '''系统用户更新'''
     model = System_User
     form_class = SysUserCreateModelForm
     template_name = 'asset/sysuser_update.html'
@@ -330,6 +331,7 @@ class SysUserUpdateView(LoginRequiredMixin,UpdateView):
         return super(SysUserUpdateView,self).get_context_data(**kwargs)
 
 class ExAssetView(LoginRequiredMixin,View):
+    '''资产导出'''
     def get(self,request):
         row = 1
         style_heading = xlwt.easyxf("""
@@ -449,10 +451,11 @@ class ExAssetView(LoginRequiredMixin,View):
             row += 1
         f.save(response)#写入表格
         return response
-import  xlrd
+
 class ImAssetView(LoginRequiredMixin,View):
+    '''资产导入'''
     def post(self, request):
-        form = FileFrom(request.POST, request.FILES)
+        form = FileFrom(request.POST, request.FILES,'')
         # file_sjdr = request.POST.get('file_keywork')
         print(form)
         if form.is_valid():
@@ -461,7 +464,6 @@ class ImAssetView(LoginRequiredMixin,View):
             with open('asset.xls', mode='wb') as f:
                 for chunk in files.chunks():
                     f.write(chunk)
-
             data = xlrd.open_workbook('asset.xls')
             # 获取工作表sheet1
             table = data.sheet_by_name('sheet1')
@@ -470,17 +472,18 @@ class ImAssetView(LoginRequiredMixin,View):
             #
             colnames = table.row_values(0)
             w = []
+            x = y = 0
             for i in range(1, nrows):
                 # 获取每行的值
                 row = table.row_values(i)
-                print()
                 for j in range(0, ncols):  #
                     if type(row[j]) == float:
                         row[j] = int(row[j])
                 if row:
                     if Asset.objects.filter(hostname=row[0], inner_ip=row[1], pub_ip=row[2]).exists():
-                        pass
+                        x += 1
                     else:
+                        y += 1
                         w.append(Asset(hostname=row[0], inner_ip=row[1], pub_ip=row[2], port=row[3], mem_total=row[4],
                                        disk_total=row[5], cpu_model=row[6], num_cpus=row[7], osfinger=row[8],
                                        osrelease=row[9],
@@ -491,4 +494,7 @@ class ImAssetView(LoginRequiredMixin,View):
             da = {"status": True, "success": '导入成功'}
             import  os
             os.remove('asset.xls')
+            print('成功导入'+ str(y),'导入失败'+str(x))
             return  HttpResponseRedirect(reverse('asset:asset_list'))
+        else:
+            return HttpResponseRedirect(reverse('asset:asset_list'))

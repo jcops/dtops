@@ -23,4 +23,5 @@ urlpatterns = [
     url(r'^$',IndexView.as_view(),name='index'),
     url('^users/', include('users.urls', namespace='users')),
     url('^asset/', include('asset.urls', namespace='asset')),
+    url('^tasks/', include('tasks.urls', namespace='tasks')),
 ]
