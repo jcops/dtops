@@ -11,11 +11,28 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dtops.settings")# project_name 
 django.setup()
 from utils.Saltapi import SaltAPI
 from  asset.models import Asset
+from  tasks.models import KeyList
 salt = SaltAPI(url="https://118.25.39.84:8000", user="saltapi", password="saltapi123")
 def getkeyall():
+    '''获取key主机节点'''
     minions,minions_pre = salt.list_all_key()
     # print(minions,minions_pre)
-    # return minions,minions_pre
+    return minions,minions_pre
+
+def salt_alive(tgt):
+    '''测试key节点连通性'''
+    status = salt.salt_alive(tgt)
+    return  status
+
+# salt_alive('10.105.75.82')
+def accept_key(tgt):
+    '''认证节点'''
+    ret = salt.accept_key(tgt)
+    return ret
+def delete_key(tgt):
+    ret = salt.delete_key(tgt)
+    return ret
+
 def disks(tgt,fun):
     dis = salt.remote_noarg_execution_sigle(tgt,fun)
     # print(dis)
@@ -126,3 +143,4 @@ bb = getss()
 # for iii in t_list:
 #     iii.join()
 #     print(iii['os'])
+

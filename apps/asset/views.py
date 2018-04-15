@@ -161,6 +161,7 @@ class DelAssetView(LoginRequiredMixin,View):
                 idstring = ','.join(ids)
                 Asset.objects.extra(where=['id IN ('+ idstring +')']).delete()
         except Exception as e:
+            logger.error(e)
             ret = {"status": False, "error": '错误{}'.format(e)}
         return HttpResponse(json.dumps(ret))
 

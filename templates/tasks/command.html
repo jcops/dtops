@@ -6,6 +6,27 @@
 {% block title %}DtOps | 命令执行{% endblock %}
 {% block custom_css %}
     <link href="{% static 'css/plugins/dataTables/datatables.min.css' %}" rel="stylesheet" type="text/css" />
+    <style>
+        .test_box {
+        min-height: 600px;
+        max-height: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 3px;
+        outline: 0;
+        border: 1px solid #a0b3d6;
+        font-size: 14px;
+        word-wrap: break-word;
+        overflow-x: hidden;
+        overflow-y: auto;
+        /*white-space:pre;*/
+        white-space: pre-line;
+        font-family: "Bitstream Vera Sans Mono", Monaco, "Courier New", Courier, monospace;
+        -webkit-user-modify: read-write-plaintext-only;
+        background-color: #161616;
+        color:#1fe01f;
+    }
+    </style>
 {% endblock %}
 
 
@@ -69,7 +90,7 @@
                     <input type="search" class="form-control input-sm" name="name" placeholder="请输入..." aria-controls="asset_list_table">
 
             </div>
-            </form>
+               </form>
 
         <form method="post" action="" class="form-horizontal" id="del_form_all">
             {% csrf_token %}
@@ -157,7 +178,7 @@
             <div class="col-lg-6">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
-                        <h5>段落文本</h5>
+                        <h5>执行结果</h5>
                         <div class="ibox-tools">
                             <a class="collapse-link">
                                 <i class="fa fa-chevron-up"></i>
@@ -177,12 +198,14 @@
                         </div>
                     </div>
                     <div class="ibox-content">
-
-                        <p class="well">执行结果展示区</p>
+{##}
+{#                        <p class="well">执行结果展示区</p>#}
+                         <div class="test_box " contenteditable="false">aaa</div>
 
                     </div>
                 </div>
-            </div></div>
+            </div>
+            </div>
 
           <div class="col-lg-6">
                 <div class="ibox float-e-margins">
@@ -207,22 +230,18 @@
                         </div>
                     </div>
                     <div class="ibox-content">
-                        <p>执行区
-                        </p>
 
                     </div>
                 </div>
-            </div></div>
+            </div>
+    </div>
 
-        </div>
+
 {% endblock %}
 
 
 {% block footer_js %}
-    <script src="{% static 'webssh_static/js/xterm.min.js' %}"></script>
-    <script src="{% static 'webssh_static/js/fullscreen.min.js' %}"></script>
-        <script src="{% static 'webssh_static/js/popper.min.js' %}"></script>
-    <script src="{% static 'webssh_static/js/main.js' %}"></script>
+
     <script src="{% static 'js/plugins/dataTables/datatables.min.js' %}"></script>
 
 {#    <script src="{% static 'js/plugins/iCheck/icheck.min.js' %}"></script>#}
@@ -267,46 +286,7 @@
 {#            });#}
 {#        </script>#}
 {##}
-{#   <!-- 批量删除弹出框 -->#}
-{#   <script>#}
-{#            $(function () {#}
-{#                $('.asset_del_all').click(function () {#}
-{#              $(document).on('click', '.asset_del_all', function () {#}
-{#                    swal({#}
-{#                        title: "你确定删除",#}
-{#                        text: "你将无法恢复",#}
-{#                        type: "warning",#}
-{#                        showCancelButton: true,#}
-{#                        confirmButtonColor: "#DD6B55",#}
-{#                        confirmButtonText: "确定",#}
-{#                        closeOnConfirm: false#}
-{#                    }, function () {#}
-{##}
-{#                        $.ajax({#}
-{#                            headers: {"X-CSRFToken": '{{ csrf_token }}'},#}
-{#                            url: "{% url 'asset:del_asset'  %}",#}
-{#                            type: 'POST',#}
-{#                            序列化id#}
-{#                            data:$('#del_form_all').serialize(),#}
-{#                            success: function (data) {#}
-{#                                var obj = JSON.parse(data);#}
-{#                                if (obj.status) {#}
-{#                                    toastr.success('删除成功');#}
-{#                                    swal({title: "删除", text: "已成功删除",imageUrl: "{% static 'img/thumbs-up.jpg' %}"}, function () {#}
-{#                                        location.href = "{% url "asset:asset_list" %}"#}
-{#                                    })#}
-{##}
-{#                                } else {#}
-{#                                    toastr.error("错误", "删除" + "[ " + obj.error + " ]" + "遇到错误");#}
-{#                                    swal("错误", "删除" + "[ " + obj.error + " ]" + "遇到错误", "error");#}
-{#                                }#}
-{#                            }#}
-{#                        });#}
-{#                    });#}
-{#                });#}
-{##}
-{#        </script>#}
-{##}
+
 {#     <script>#}
 {#     资产信息刷新#}
 {#            $(function () {#}
@@ -357,163 +337,5 @@
 {##}
 {#        </script>#}
 {#    <script>#}
-{#    <!--终端连接 -->#}
-{#           jQuery(function ($) {#}
-{#                $(document).on('click', '.webssh', function (event) {#}
-{##}
-{#                    event.preventDefault();#}
-{##}
-{#                    var id_a =$(this).attr('id');#}
-{##}
-{#                    $.ajax({#}
-{#                        headers: {"X-CSRFToken": '{{ csrf_token }}'},#}
-{#                        url: "{% url 'asset:asset_web' %}",#}
-{#                        type: 'POST',#}
-{#                        data: {'id': id_a},#}
-{#                        success: function (ret) {#}
-{##}
-{#                            var obj = JSON.parse(ret);#}
-{#                            var ips =  obj.ip;#}
-{#                            var ports = obj.port;#}
-{#                            var usernames = obj.username;#}
-{#                            var passwords = obj.password;#}
-{#                            var privatekey = obj.privatekey;#}
-{#                            $.ajax({#}
-{#                                url: "http://{{ web_ssh }}:{{ web_port }}/",#}
-{#                                type: 'POST',#}
-{#                                data: {#}
-{#                                    hostname: ips,#}
-{#                                    port: ports,#}
-{#                                    username: usernames,#}
-{#                                    password: passwords,#}
-{#                                    privatekey: privatekey#}
-{#                                },#}
-{#                                crossDomain: true,#}
-{#                                success: callback#}
-{#                            });#}
-{##}
-{#                            function current_geometry() {#}
-{#                                cols = parseInt(window.innerWidth / 10);#}
-{#                                rows = parseInt(window.innerHeight / 24);#}
-{#                                return [cols, rows];#}
-{#                            }#}
-{##}
-{##}
-{#                            function callback(msg) {#}
-{#                                console.log(msg);#}
-{#                                if (msg.status) {#}
-{#                                    swal("错误", "登陆" + "[ " + msg.status + " ]" + "遇到错误", "error");#}
-{#                                    return;#}
-{#                                }#}
-{##}
-{##}
-{#                                var url = "ws://{{ web_ssh }}:{{ web_port }}/" + 'ws?id=' + msg.id,#}
-{#                                    socket = new WebSocket(url),#}
-{#                                    terminal = document.getElementById('#terminal'),#}
-{#                                    geometry = current_geometry();#}
-{#                                term  =  new Terminal({cursorBlink: true, cols: geometry[0], rows: geometry[1]});#}
-{##}
-{#                                console.log(url);#}
-{#                                term.on('data', function (data) {#}
-{#                                    console.log(data);#}
-{#                                    socket.send(data);#}
-{#                                });#}
-{##}
-{#                                socket.onopen = function (e) {#}
-{#                                    $('.container1').hide();#}
-{#                                    term.open(terminal, true);#}
-{#                                    term.toggleFullscreen(true);#}
-{#                                };#}
-{##}
-{#                                socket.onmessage = function (msg) {#}
-{#                                    console.log(msg);#}
-{#                                    term.write(msg.data);#}
-{#                                };#}
-{##}
-{#                                socket.onerror = function (e) {#}
-{#                                    console.log(e);#}
-{#                                };#}
-{##}
-{#                                socket.onclose = function (e) {#}
-{#                                    console.log(e);#}
-{#                                    term.destroy();#}
-{#                                    $('.container1').show();#}
-{#                                    // status.text(e.reason);#}
-{#                                };#}
-{#                            }#}
-{##}
-{##}
-{#                            $(window).resize(function () {#}
-{#                                if (typeof term != "undefined") {#}
-{#                                    geometry = current_geometry();#}
-{#                                    term.geometry = geometry;#}
-{#                                    term.resize(geometry[0], geometry[1]);#}
-{#                                      console.log(geometry);#}
-{##}
-{##}
-{#                                }#}
-{#                            });#}
-{##}
-{#                        }#}
-{#                    });#}
-{#                });#}
-{#            });#}
-{##}
-{#    </script>#}
-{##}
-{#    <script>#}
-{##}
-{#   $('#btn_sjdr').click(function(){#}
-{##}
-{#   $.post("{% url 'asset:im_asset' %}",#}
-{#     {#}
-{#      headers: {"X-CSRFToken": '{{ csrf_token }}'},#}
-{#      file:$("#file").val(),#}
-{#     },#}
-{#     function(data) {#}
-{#      alert('成功')#}
-{#     }#}
-{#   )#}
-{#  });#}
-{# $('#btn_sjdr').click(function(){#}
-{#    $.ajax({#}
-{#      url: "{% url 'asset:im_asset' %}",#}
-{#      type: 'POST',#}
-{#      file:$("#file").val(),#}
-{#      success: function (data) {#}
-{##}
-{#     var obj = JSON.parse(data);#}
-{#      if (obj.status) {#}
-{#              location.href = "{% url "asset:asset_list" %}"#}
-{#      }#}
-{#      }#}
-{#      });#}
-{# });#}
-{##}
-{##}
-{#    </script>#}
-{# <!-- 添加记录提交 -->#}
-{#  <script>#}
-{#      $(function () {#}
-{#          // 提交表单#}
-{#          $('#js_addHostBtn').on('click', function () {#}
-{#              $.ajax({#}
-{#                  cache: false,#}
-{#                  type: "POST",#}
-{#                  url: "{% url 'asset:asset_add' %}",#}
-{#                  data: $('#js_addHostForm'),#}
-{#                  async: true,#}
-{#                  success: function (data) {#}
-{#                      if (data.status == 'success') {#}
-{#                          window.location.href = "{% url 'asset:asset_list' %}";#}
-{#                          window.alert(data.msg);#}
-{#                      } else if (data.status == 'fail') {#}
-{#                              window.location.reload();#}
-{#                          window.alert(data.msg);#}
-{#                      }#}
-{#                  }#}
-{#              });#}
-{#          });#}
-{#      })#}
-{#  </script>#}
+
 {% endblock %}

@@ -53,6 +53,7 @@
                 <a href="#"><i class="fa fa-inbox"></i> <span class="nav-label">工具管理</span>
                     <span class="fa arrow"> </span></a>
                 <ul class="nav nav-second-level">
+                     <li class="{{ tasks_list_active }}"><a href="{% url 'tasks:key_list' %}">key管理</a></li>
                                      <li class="{{ tasks_list_active }}"><a href="{% url 'tasks:cmd_list' %}">命令执行</a></li>
                     <li class="{{ system_user_active }}"><a href="{% url 'asset:system_user' %}">包管理</a></li>
                     <li class="{{ produce_list_active }}"><a href="{% url 'asset:product_list' %}">脚本执行</a></li>

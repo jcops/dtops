@@ -182,6 +182,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
+        'tasks': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
         'handlers': {
             'file': {
                 'level': 'DEBUG',
