@@ -12,7 +12,8 @@ django.setup()
 from utils.Saltapi import SaltAPI
 from  asset.models import Asset
 from  tasks.models import KeyList
-salt = SaltAPI(url="https://118.25.39.84:8000", user="saltapi", password="saltapi123")
+# salt = SaltAPI(url="https://118.25.39.84:8000", user="saltapi", password="saltapi123")
+salt = SaltAPI()
 def getkeyall():
     '''获取key主机节点'''
     minions,minions_pre = salt.list_all_key()

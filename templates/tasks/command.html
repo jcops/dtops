@@ -26,6 +26,35 @@
         background-color: #161616;
         color:#1fe01f;
     }
+    .background {
+    display: block;
+    width: 100%;
+    height: 100%;
+    opacity: 0.4;
+    filter: alpha(opacity=40);
+    background:while;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2000;
+}
+.progressBar {
+     border: solid 2px #86A5AD;
+      display: block;
+    width: 100%;
+    height: 100%;
+    opacity: 0.4;
+    filter: alpha(opacity=40);
+    background:while;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2000;
+    background: white  url("/static/img/loading.gif") no-repeat center center;
+}
+.progressBar {
+position:absolute;top:0;right:0;bottom:0;left:0;
+}
     </style>
 {% endblock %}
 
@@ -51,10 +80,11 @@
         </div>
     </div>
     <div class="alert alert-info">
-    远程执行命令
+    远程执行异步命令,危险命令无法执行喔
     </div>
 
-
+<div id="background" class="background" style="display: none; "></div>
+     <div id="progressBar" class="progressBar" style="display: none; "></div>
     <div class="wrapper wrapper-content animated fadeInRight">
 
             <div class="row">
@@ -92,8 +122,8 @@
             </div>
                </form>
 
-        <form method="post" action="" class="form-horizontal" id="del_form_all">
-            {% csrf_token %}
+        <form  method="post"  action="" class="form-horizontal" id="form_all">
+{#            {% csrf_token %}#}
             <table class="table table-striped table-bordered table-hover  dataTable no-footer dataTables-asset">
                 <thead>
                 <tr role="row">
@@ -104,8 +134,8 @@
                     <th class="text-center sorting">主机名</th>
                     <th class="text-center sorting">内网IP</th>
                     <th class="text-center sorting">外网IP</th>
-                    <th class="text-center sorting">用户名</th>
-                     <th class="text-center sorting">产品线</th>
+{#                    <th class="text-center sorting">用户名</th>#}
+{#                     <th class="text-center sorting">产品线</th>#}
 {#                    <th class="text-center sorting">备注</th>#}
 {#                          <th class="text-center sorting">标签</th>#}
 {#                          <th class="text-center sorting">云平台</th>#}
@@ -128,9 +158,9 @@
                         <td class=" text-center">{{ asset_list.inner_ip }}</td>
                         <td class=" text-center">{{ asset_list.pub_ip|default:'N/A' }}</td>
 
-                        <td class=" text-center">{{ asset_list.system_user }}</td>
-                         <td class=" text-center">{{ asset_list.system_user }}</td>
-                     <td class=" text-center">{{ asset_list.product.name|default:'N/A' }}</td>
+{#                        <td class=" text-center">{{ asset_list.system_user }}</td>#}
+{#                         <td class=" text-center">{{ asset_list.system_user }}</td>#}
+{#                     <td class=" text-center">{{ asset_list.product.name|default:'N/A' }}</td>#}
 
 
                 {% endfor %}
@@ -166,7 +196,23 @@
                 </div>
 
           </form>
+
          </div>
+                    <hr>
+
+
+            <form >
+                <input type="text" class="form-control" id="cmd_content" placeholder="Command">
+                                        <table>
+                                            <tr>
+                                                <td>
+                                                 <input type="button" class="btn btn-xl btn-success"  value="执行" onclick="start_deploy()">
+{#                                               <input type="button" class="btn btn-xl btn-success"  value="执行">#}
+                                                </td>
+                                            </tr>
+                                        </table>
+            </form>
+
                     </div>
                 </div>
             </div>
@@ -200,41 +246,41 @@
                     <div class="ibox-content">
 {##}
 {#                        <p class="well">执行结果展示区</p>#}
-                         <div class="test_box " contenteditable="false">aaa</div>
+                         <div class="test_box  weel"  contenteditable="false" ></div>
 
                     </div>
                 </div>
             </div>
             </div>
 
-          <div class="col-lg-6">
-                <div class="ibox float-e-margins">
-                    <div class="ibox-title">
-                        <h5>段落文本</h5>
-                        <div class="ibox-tools">
-                            <a class="collapse-link">
-                                <i class="fa fa-chevron-up"></i>
-                            </a>
-                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                                <i class="fa fa-wrench"></i>
-                            </a>
-                            <ul class="dropdown-menu dropdown-user">
-                                <li><a href="#">选项 1</a>
-                                </li>
-                                <li><a href="#">选项 2</a>
-                                </li>
-                            </ul>
-                            <a class="close-link">
-                                <i class="fa fa-times"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="ibox-content">
-
-                    </div>
-                </div>
-            </div>
-    </div>
+{#          <div class="col-lg-6">#}
+{#                <div class="ibox float-e-margins">#}
+{#                    <div class="ibox-title">#}
+{#                        <h5>段落文本</h5>#}
+{#                        <div class="ibox-tools">#}
+{#                            <a class="collapse-link">#}
+{#                                <i class="fa fa-chevron-up"></i>#}
+{#                            </a>#}
+{#                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">#}
+{#                                <i class="fa fa-wrench"></i>#}
+{#                            </a>#}
+{#                            <ul class="dropdown-menu dropdown-user">#}
+{#                                <li><a href="#">选项 1</a>#}
+{#                                </li>#}
+{#                                <li><a href="#">选项 2</a>#}
+{#                                </li>#}
+{#                            </ul>#}
+{#                            <a class="close-link">#}
+{#                                <i class="fa fa-times"></i>#}
+{#                            </a>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <div class="ibox-content">#}
+{##}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#    </div>#}
 
 
 {% endblock %}
@@ -243,6 +289,91 @@
 {% block footer_js %}
 
     <script src="{% static 'js/plugins/dataTables/datatables.min.js' %}"></script>
+<script>
+
+
+    function start_deploy() {
+        var command = $(" #cmd_content ").val();
+        // 获取选中的主机
+        var host_arr =  $(" #form_all ");
+           // 判断用户是否选择了主机或者应用
+        if (host_arr.length == 0|| host_arr==null ||host_arr==""  || command.length == 0 || command =="" || command==undefined){
+                swal({
+                  title: "主机或命令不能为空，请重新输入或选择...",
+                  timer: 1700,
+                    type:'error',
+                  showConfirmButton: false
+                });
+            exit;  // 如果为空，直接退出js
+        }
+        swal({
+              title: "你确定在主机上执行命令:" + "【" + command + "】",
+              type: "warning",
+              showCancelButton: true,
+              showLoaderOnConfirm: true,
+              confirmButtonColor: "#1ab394",
+              confirmButtonText: "是的，执行",
+              cancelButtonText: "我在想想吧...",
+              closeOnConfirm: false,
+              closeOnCancel: true  //关闭取消后还弹出让你确认的效果提示
+            },
+              function(isConfirm){
+              if (isConfirm) {    // 如果确认就会去携带者hostname去后台处理
+
+                     swal({
+                          title: "好的，执行中...",
+                          timer: 1000,
+                          type:'success',
+                          showConfirmButton: false
+                          });
+                     var ajaxbg = $("#background,#progressBar");
+
+
+                    ajaxbg.show();
+
+              $.ajax ({
+                 headers: {"X-CSRFToken": '{{ csrf_token }}'},
+                 type:'post',
+                  //需要提交的数据
+                 data: {"form_all":$('#form_all').serialize(),"command":$(" #cmd_content ").val()},
+                 url:"{% url 'tasks:run_cmd' %}",
+                  success:function (res) {
+                    ajaxbg.hide();
+                      var json_data = JSON.parse(res);
+                      //判断是否执行成功
+                      if (json_data.result) {
+                           $(".test_box").html("");
+                          //循环服务器端返回的json数据
+                          $.each(json_data.data, function (data, values) {
+                                toastr.success(json_data.message);
+
+                                    $(".test_box").append(
+                                         '执行命令:',command,"\n",
+                                         '目标主机:',values.hostname,"\n",
+                                         '执行时间:',json_data.set_time,"\n",
+                                         '执行结果:',"\n",values.data,"\n",
+                                         '-------------------------------------------------\n'
+                                         );
+
+
+
+
+
+                              $(".test_box").scrollTop(5)
+                          });
+                      }else { toastr.error(json_data.message);
+                            {#swal(json_data.message,'T_T','error');#}
+                            }
+                  }
+            //以下不动
+              });
+              }
+    });
+
+   }
+
+</script>
+{% endblock %}
 
 {#    <script src="{% static 'js/plugins/iCheck/icheck.min.js' %}"></script>#}
 
@@ -338,4 +469,3 @@
 {#        </script>#}
 {#    <script>#}
 
-{% endblock %}

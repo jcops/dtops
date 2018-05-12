@@ -16,8 +16,9 @@ from utils.Export_assets import write_excel
 import traceback
 import logging
 logger = logging.getLogger('asset')
-salt = SaltAPI(url="https://118.25.39.84:8000", user="saltapi", password="saltapi123")
+# salt = SaltAPI(url="https://118.25.39.84:8000", user="saltapi", password="saltapi123")
 # Create your views here.
+salt = SaltAPI()
 
 class AssetListView(LoginRequiredMixin,ListView):
     '''资产列表'''
