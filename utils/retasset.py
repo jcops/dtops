@@ -57,24 +57,27 @@ def disks(tgt,fun):
 
 
 def auto_asset(node):
-    ret = salt.remote_grains_execution_sigle(node)
-    # asset_info = {'ls':'pwd','os':'oooo','dns':'1.1.1.1'}
-    asset_info={}
-    asset_info['os']= ret[node]['oscodename']
-    asset_info['kernelrelease']= ret[node]['kernelrelease']
-    asset_info['cpu_model']= ret[node]['cpu_model']
-    asset_info['dns']= ','.join(ret[node]['dns']['ip4_nameservers'])
-    asset_info['serialnumber'] =  ret[node]['serialnumber']
-    asset_info['virtual'] =  ret[node]['virtual']
-    asset_info['localhost'] = ret[node]['localhost']
-    asset_info['mem_total'] =  ret[node]['mem_total']
-    asset_info['num_cpus'] =  ret[node]['num_cpus']
-    asset_info['ip4_interfaces'] = " ".join(ret[node]['ip4_interfaces']['eth0'])
-    asset_info['hwaddr_interfaces'] = ret[node]['hwaddr_interfaces']['eth0']
-    asset_info['disks'] = disks(node,'disk.usage')
+    try:
+        ret = salt.remote_grains_execution_sigle(node)
+        # asset_info = {'ls':'pwd','os':'oooo','dns':'1.1.1.1'}
+        asset_info={}
+        asset_info['os']= ret[node]['oscodename']
+        asset_info['kernelrelease']= ret[node]['kernelrelease']
+        asset_info['cpu_model']= ret[node]['cpu_model']
+        asset_info['dns']= ','.join(ret[node]['dns']['ip4_nameservers'])
+        asset_info['serialnumber'] =  ret[node]['serialnumber']
+        asset_info['virtual'] =  ret[node]['virtual']
+        asset_info['localhost'] = ret[node]['localhost']
+        asset_info['mem_total'] =  ret[node]['mem_total']
+        asset_info['num_cpus'] =  ret[node]['num_cpus']
+        asset_info['ip4_interfaces'] = " ".join(ret[node]['ip4_interfaces']['eth0'])
+        asset_info['hwaddr_interfaces'] = ret[node]['hwaddr_interfaces']['eth0']
+        asset_info['disks'] = disks(node,'disk.usage')
 
-    # selinux = ret[node]['enabled']
-    return asset_info
+        # selinux = ret[node]['enabled']
+        return asset_info
+    except Exception as e:
+        print('错误',e)
 # ass = Asset.objects.all()
 # for ii in ass:
 #     asset_info=auto_asset(ii.inner_ip)
@@ -95,6 +98,21 @@ def auto_asset(node):
 #         asset.disk_total = ''.join(de + di['total'])
 #     asset.save()
 
+# class MyThread(threading.Thread):
+#     def __init__(self, func,args):
+#         super(MyThread, self).__init__()
+#         self.func = func
+#         self.args =args
+#
+#
+#     def run(self):
+#         self.result = self.func(*self.args)
+#         # 相当于执行auto_asset(node)
+#     def get_result(self):
+#         try:
+#             return self.result  # 如果子线程不使用join方法，此处可能会报没有self.result的错误
+#         except Exception:
+#             return None
 class MyThread(threading.Thread):
     def __init__(self, func,args):
         super(MyThread, self).__init__()
@@ -116,7 +134,6 @@ def getss():
     b = []
     for i in obj:
         b.append(i.inner_ip)
-
     files = range(len(b))
     t_list = []
     for i in files:
@@ -125,9 +142,9 @@ def getss():
         t.start()
     for t in t_list:
         t.join()  # 一定要join，不然主线程比子线程跑的快，会拿不到结果
-        aa = t.get_result()
+        # aa = t.get_result()
     return t_list
-bb = getss()
+# bb = getss()
 
 
 #     #启动线程

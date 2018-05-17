@@ -91,9 +91,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'dtops',
         'USER': 'root',
-        'PASSWORD': '',
+        'PASSWORD': 'Niejc123#',
         'PORT': '3306',
-        'HOST': '',
+        'HOST': '118.25.39.84',
     }
 }
 

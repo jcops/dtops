@@ -328,8 +328,7 @@ class DeployModelView(LoginRequiredMixin,View):
         except Exception as e:
             logger.error(e)
             return HttpResponse(json.dumps({"result": False, "data": data, "set_time": time_t, "message": "执行失败"}))
-
-        return HttpResponse(json.dumps({"result": True, "data": data, "set_time": time_t, "message": "执行成功"}))
+        return  HttpResponse(json.dumps({"result": True, "data": data, "set_time": time_t, "message": "执行成功"}))
 
 
 
